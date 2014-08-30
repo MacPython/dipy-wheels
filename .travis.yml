@@ -1,0 +1,37 @@
+language:
+- objective-c
+env:
+  global:
+  - LATEST_TAG=1 # comment out to build version in submodule
+  matrix:
+  - VERSION=2.7.8 NUMPY_VERSION=1.6.1 # tune to taste
+  - VERSION=3.3.5 NUMPY_VERSION=1.7.1
+  - VERSION=3.4.1 NUMPY_VERSION=1.7.1
+install:
+  - source terryfy/travis_tools.sh
+  - get_python_environment macpython $VERSION venv
+  - pip install delocate numpy==$NUMPY_VERSION scipy cython nibabel
+  - if [ -n "$LATEST_TAG" ]; then checkout_closest_tag dipy; fi
+  - cd dipy
+  - python setup.py bdist_wheel
+  - delocate-listdeps dist/*.whl # lists library dependencies
+  - delocate-wheel dist/*.whl # copies library dependencies into wheel
+  - rename_wheels dist
+  - pip install dist/*.whl
+  - cd ..
+script:
+  # install dependencies for tests
+  - pip install nose
+  - mkdir tmp_for_test
+  - cd tmp_for_test
+  - python ../dipy/tools/dipnost dipy
+  - cd ..
+before_deploy: cd dipy/dist
+deploy:
+  provider: cloudfiles
+  username: travis-worker
+  api_key:
+      secure: "eXAwoK3SjIpIrJTg8j8+xjOS0VdGhsaJCzKffrUb4Ai+7Ft/2PJDebvBeoYQChcr4CvjtOlzSLwVxI05m0tktjE3yDleVwe82I7cu12d3YOw6IVEbGMFNAHEGqlpzSStP2ViKE7qUGCdJ7ar56p/jMIoDBWuGBMh+lhoN6tUMlA="
+  region: ORD
+  container: wheels
+  skip_cleanup: true
