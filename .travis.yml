@@ -10,7 +10,8 @@ env:
 install:
   - source terryfy/travis_tools.sh
   - get_python_environment macpython $VERSION venv
-  - pip install delocate numpy==$NUMPY_VERSION scipy cython nibabel
+  - pip install delocate numpy==$NUMPY_VERSION scipy cython
+  - pip install nibabel # needs numpy installed
   - if [ -n "$LATEST_TAG" ]; then checkout_closest_tag dipy; fi
   - cd dipy
   - python setup.py bdist_wheel
