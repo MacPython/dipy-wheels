@@ -24,7 +24,7 @@ script:
   # install dependencies for tests
   - pip install nose
   # Numpy errors in for Python 3.4; update numpy to recent
-  - if [ -n "$(pyver_ge $VERSION 3.4.0)" ]; then
+  - if [ -n "$(pyver_ge 3.4.0 $VERSION)" ]; then
     pip install -U numpy;
     fi
   - mkdir tmp_for_test
