@@ -4,8 +4,8 @@ env:
   global:
   - LATEST_TAG=1 # comment out to build version in submodule
   matrix:
-  - VERSION=2.7.8 NUMPY_VERSION=1.6.1 # tune to taste
-  - VERSION=3.3.5 NUMPY_VERSION=1.7.1
+  - VERSION=2.7.8 NUMPY_VERSION=1.6.1 # set numpy dependencies
+  - VERSION=3.3.5 NUMPY_VERSION=1.7.1 # for each Python version
   - VERSION=3.4.1 NUMPY_VERSION=1.7.1
 install:
   - source terryfy/travis_tools.sh
@@ -23,6 +23,10 @@ install:
 script:
   # install dependencies for tests
   - pip install nose
+  # Numpy errors in for Python 3.4; update numpy to recent
+  - if [ -n "$(pyver_ge $VERSION 3.4.0)" ]; then
+    pip install -U numpy;
+    fi
   - mkdir tmp_for_test
   - cd tmp_for_test
   - python ../dipy/tools/dipnost dipy
