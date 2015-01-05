@@ -2,7 +2,7 @@ language:
 - objective-c
 env:
   global:
-  - LATEST_TAG=1 # comment out to build version in submodule
+  #- LATEST_TAG=1 # comment out to build version in submodule
   matrix:
   - VERSION=2.7.8 NUMPY_VERSION=1.6.1 # set numpy dependencies
   - VERSION=3.3.5 NUMPY_VERSION=1.7.1 # for each Python version
