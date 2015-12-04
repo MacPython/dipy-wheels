@@ -12,8 +12,8 @@ install:
   - source terryfy/travis_tools.sh
   - get_python_environment macpython $VERSION venv
   - pip install delocate numpy==$NUMPY_VERSION scipy cython
-  # Update wheel for Python 3.5
-  - pip install -U wheel
+  # Update pip, wheel for Python 3.5
+  - pip install -U pip wheel
   # Allow nipy wheelhouse for Python 3.5 wheel
   - pip install -f $NIPY_WHEELHOUSE numpy==$NUMPY_VERSION
   # Use clang to avoid warnings on Python 3.5
