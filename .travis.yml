@@ -2,18 +2,26 @@ language:
 - objective-c
 env:
   global:
-  - DIPY_COMMIT='latest-tag' # comment out to build version in submodule
+  - BUILD_COMMIT='latest-tag' # comment out to build version in submodule
   matrix:
-  - VERSION=2.7.9 NUMPY_VERSION=1.6.1 # set numpy dependencies
-  - VERSION=3.3.5 NUMPY_VERSION=1.7.1 # for each Python version
-  - VERSION=3.4.2 NUMPY_VERSION=1.7.1
+  - VERSION=2.7.9 NUMPY_VERSION=1.7.1 NUMPY_TEST_VERSION=1.7.1
+ -  VERSION=3.3.5 NUMPY_VERSION=1.7.1 NUMPY_TEST_VERSION=1.7.1
+  - VERSION=3.4.2 NUMPY_VERSION=1.7.1 NUMPY_TEST_VERSION=1.9.3
+  - VERSION=3.5.0 NUMPY_VERSION=1.7.1 NUMPY_TEST_VERSION=1.9.3
 install:
   - source terryfy/travis_tools.sh
   - get_python_environment macpython $VERSION venv
   - pip install delocate numpy==$NUMPY_VERSION scipy cython
+  # Update wheel for Python 3.5
+  - pip install -U wheel
+  # Allow nipy wheelhouse for Python 3.5 wheel
+  - pip install -f $NIPY_WHEELHOUSE numpy==$NUMPY_VERSION
+  # Use clang to avoid warnings on Python 3.5
+  - export CC=clang
+  - export CXX=clang++
   - pip install nibabel # needs numpy installed
-  - if [ -n "$DIPY_COMMIT" ]; then
-    checkout_commit dipy $DIPY_COMMIT;
+  - if [ -n "$BUILD_COMMIT" ]; then
+        checkout_commit dipy $DIPY_COMMIT;
     fi
   - cd dipy
   - python setup.py bdist_wheel
@@ -25,10 +33,9 @@ install:
 script:
   # install dependencies for tests
   - pip install nose
-  # Numpy errors in for Python 3.4; update numpy to recent
-  - if [ -n "$(pyver_ge $VERSION 3.4.0)" ]; then
-    pip install -U numpy;
-    fi
+  # Install needed numpy version for tests
+  - pip install numpy==$NUMPY_TEST_VERSION
+  # Run the tests
   - mkdir tmp_for_test
   - cd tmp_for_test
   - python ../dipy/tools/dipnost dipy
