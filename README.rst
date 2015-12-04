@@ -1,35 +1,120 @@
-##################
-dipy wheel builder
-##################
+##################################
+Building and uploading dipy wheels
+##################################
 
-Repository to build OSX wheels for dipy.
+*******
+For OSX
+*******
 
-The usual behavior of the repo is to build the wheel corresponding to the most
-recent git tag (see `git-closest-tag
-<https://github.com/MacPython/terryfy/blob/master/git-closest-tag>`_.
+We automate OSX wheel building using this custom github repository that builds
+on the travis-ci OSX machines.
 
-To build a particular commit instead:
+The travis-ci interface for the builds is :
+https://travis-ci.org/MacPython/dipy-wheels
 
-* comment out the line ``global: LATEST_TAG=1`` in the ``.travis.yml`` file.
-* Update the dipy submodule the with commit you want to build:
+The driving github repository is :
+https://github.com/MacPython/dipy-wheels
 
-    * cd dipy && git pull && git checkout DESIRED_COMMIT
-    * cd .. && git add dipy
-    * git commit
+How it works
+============
 
-where "DESIRED_COMMIT" is a something specifycing the git revision to build
+The wheel-building repository:
+
+* does a fresh build of the required C / C++ libraries;
+* builds a dipy wheel, linking against these fresh builds;
+* processes the wheel using [delocate](https://pypi.python.org/pypi/delocate).
+  `delocate` copies the required dynamic libraries into the wheel and relinks
+  the extension modules against the copied libraries;
+* uploads the built wheel to http://wheels.scipy.org (a Rackspace container
+  kindly donated by Rackspace to scikit-learn).
+
+The resulting wheel is therefore self-contained and does not need any external
+dynamic libraries apart from those provided as standard by OSX.
+
+The ``.travis.yml`` file in this repository has a line containing the API key
+for the Rackspace container encrypted with an RSA key that is unique to the
+repository - see http://docs.travis-ci.com/user/encryption-keys.  This
+encrypted key gives the travis build permission to upload to the Rackspace
+directory pointed to by http://wheels.scipy.org.
+
+Triggering a build
+==================
+
+You will need write permission to the github repository to trigger new builds
+on the travis-ci interface.  Contact us on the mailing list if you need this.
+
+You can trigger a build by:
+
+* making a commit to the `dipy-wheels` repository (e.g. with `git
+  commit --allow-empty`); or
+* clicking on the circular arrow icon towards the top right of the travis-ci
+  page, to rerun the previous build.
+
+In general, it is better to trigger a build with a commit, because this makes
+a new set of build products and logs, keeping the old ones for reference.
+Keeping the old build logs helps us keep track of previous problems and
+successful builds.
+
+Which dipy commit does the repository build?
+============================================
+
+By default, the `dipy-wheels` repository is usually set up to build
+the latest git tag.  By "latest" we mean the tag on the branch most recently
+branched from master - see http://stackoverflow.com/a/24557377/1939576. To
+check whether you are building the latest tag have a look around line 5 of
+`.travis.yml` in the `dipy-wheels` repository.  You should see something
+like::
+
+    - BUILD_COMMIT='latest-tag'
+
+If this is commented out, then the repository is set up to build the current
+commit in the `dipy` submodule of the repository.  If it is set to
+another value then it will be specifying a commit to build.
+
+You can therefore build any arbitrary commit by specifying the commit hash or
+branch name or tag name in this line of the `.travis.yml` file.
+
+Uploading the built wheels to pypi
+==================================
+
+Be careful, http://wheels.scipy.org points to a container on a distributed
+content delivery network.  It can take up to 15 minutes for the new wheel file
+to get updated into the container at http://wheels.scipy.org.
+
+When the wheels are updated, you can of course just download them to your
+machine manually, and then upload them manually to pypi, or by using
+twine_.  You can also use a script for doing this, housed at :
+https://github.com/MacPython/terryfy/blob/master/wheel-uploader
+
+You'll need twine and `beautiful soup 4 <bs4>`_.
+
+You will typically have a directory on your machine where you store wheels,
+called a `wheelhouse`.   The typical call for `wheel-uploader` would then
+be something like::
+
+    wheel-uploader -v -w ~/wheelhouse dipy 1.0.3
+
+where:
+
+* `-v` means give verbose messages;
+* `-w ~/wheelhouse` means download the wheels from https://wheels.scipy.org to
+  the directory `~/wheelhouse`;
+* `dipy` is the root name of the wheel(s) to download / upload;
+* `1.0.3` is the version to download / upload.
+
+So, in this case, `wheel-uploader` will download all wheels starting with
+`dipy-1.0.3-` from http://wheels.scipy.org to `~/wheelhouse`, then upload
+them to pypi.
+
+Of course, you will need permissions to upload to pypi, for this to work.
+
+Maintaining the build repo
+==========================
+
 * Check minimum numpy versions to build against in ``.travis.yml`` file.  You
-  need to build against the earliest numpy that dipy is compatible with; see
-  `forward, backward numpy compatibility
+  need to build against the earliest numpy that dipy is compatible with;
+  see `forward, backward numpy compatibility
   <http://stackoverflow.com/questions/17709641/valueerror-numpy-dtype-has-the-wrong-size-try-recompiling/18369312#18369312>`_
-The wheels get uploaded to a `rackspace container
-<http://a365fff413fe338398b6-1c8a9b3114517dc5fe17b7c3f8c63a43.r19.cf2.rackcdn.com>`_
-to which I have the API key.  The API key is encrypted to this specific repo
-in the ``.travis.yml`` file, so the upload won't work for you from another
-account.  Either contact me to get set up, or use another upload service such as
-github - see for example Jonathan Helmus' `sckit-image wheels builder
-<https://github.com/jjhelmus/scikit-image-ci-wheel-builder>`_
 
-I got the rackspace API key from Olivier Grisel - we might be able to share
-this account across projects - again - please contact me or Olivier if you'd
-like this to happen.
+.. _twine: https://pypi.python.org/pypi/twine
+.. _bs4: https://pypi.python.org/pypi/beautifulsoup4
