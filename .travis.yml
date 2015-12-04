@@ -22,7 +22,7 @@ install:
   - export CXX=clang++
   - pip install nibabel # needs numpy installed
   - if [ -n "$BUILD_COMMIT" ]; then
-        checkout_commit dipy $DIPY_COMMIT;
+        checkout_commit dipy $BUILD_COMMIT;
     fi
   - cd dipy
   - python setup.py bdist_wheel
