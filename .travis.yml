@@ -39,7 +39,7 @@ script:
   # Run the tests
   - mkdir tmp_for_test
   - cd tmp_for_test
-  # -  python ../dipy/tools/dipnost dipy
+  - python ../dipy/tools/dipnost dipy
   - cd ..
 before_deploy: cd dipy/dist
 deploy:
