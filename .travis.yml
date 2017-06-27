@@ -4,8 +4,10 @@ env:
       - BUILD_COMMIT=0.12.0
       - PLAT=x86_64
       - UNICODE_WIDTH=32
-      - NP_BUILD_DEP="numpy==1.8.0"
-      - NP_TEST_DEP="numpy==1.8.0"
+      - NP_BUILD_DEP="numpy==1.7.1"
+      - NP_TEST_DEP="numpy==1.7.1"
+      # Pin scipy dependency for compatibility with older numpy.
+      - SCIPY_DEP="scipy==0.17.0"
       - WHEELHOUSE_UPLOADER_USERNAME=travis-worker
       # Following generated with
       # travis encrypt -r MacPython/dipy-wheels WHEELHOUSE_UPLOADER_SECRET=<the api key>
@@ -65,12 +67,14 @@ matrix:
         - MB_PYTHON_VERSION=3.6
         - NP_BUILD_DEP=numpy==1.11.3
         - NP_TEST_DEP=numpy==1.11.3
+        - SCIPY_DEP=scipy
     - os: linux
       env:
         - MB_PYTHON_VERSION=3.6
         - PLAT=i686
         - NP_BUILD_DEP=numpy==1.11.3
         - NP_TEST_DEP=numpy==1.11.3
+        - SCIPY_DEP=scipy
     - os: osx
       language: generic
       env: MB_PYTHON_VERSION=2.7
@@ -91,6 +95,7 @@ matrix:
         - MB_PYTHON_VERSION=3.6
         - NP_BUILD_DEP=numpy==1.11.3
         - NP_TEST_DEP=numpy==1.11.3
+        - SCIPY_DEP=scipy
 
 before_install:
     - BUILD_DEPENDS="$NP_BUILD_DEP Cython nibabel"
