@@ -3,10 +3,13 @@ Building and uploading dipy wheels
 ##################################
 
 We automate wheel building using this custom github repository that builds on
-the travis-ci OSX machines and the travis-ci Linux machines.
+the travis-ci OSX machines, travis-ci Linux machines, and the Appveyor VMs.
 
 The travis-ci interface for the builds is
-https://travis-ci.org/MacPython/dipy-wheels
+https://travis-ci.org/MacPython/cython-wheels
+
+Appveyor interface at
+https://ci.appveyor.com/project/matthew-brett/dipy-wheels
 
 The driving github repository is
 https://github.com/MacPython/dipy-wheels
@@ -39,8 +42,8 @@ containers we use to house the uploads.
 Triggering a build
 ==================
 
-You will likely want to edit the ``.travis.yml`` file to specify the
-``BUILD_COMMIT`` before triggering a build - see below.
+You will likely want to edit the ``.travis.yml`` and ``appveyor.yml`` files to
+specify the ``BUILD_COMMIT`` before triggering a build - see below.
 
 You will need write permission to the github repository to trigger new builds
 on the travis-ci interface.  Contact us on the mailing list if you need this.
@@ -61,8 +64,9 @@ Which dipy commit does the repository build?
 ============================================
 
 The ``dipy-wheels`` repository will build the commit specified in the
-``BUILD_COMMIT`` at the top of the ``.travis.yml`` file.  This can be any
-naming of a commit, including branch name, tag name or commit hash.
+``BUILD_COMMIT`` at the top of the ``.travis.yml`` and ``appveyor.yml`` files.
+This can be any naming of a commit, including branch name, tag name or commit
+hash.
 
 Uploading the built wheels to PyPI
 ==================================
@@ -99,7 +103,7 @@ where:
 * ``-w ~/wheelhouse`` means download the wheels from to the local directory
   ``~/wheelhouse``.
 
-``dipy`` is the root name of the wheel(s) to download / upload, and ``0.11.0``
+``dipy`` is the root name of the wheel(s) to download / upload, and ``0.13.0``
 is the version to download / upload.
 
 In order to upload the wheels, you will need something like this
@@ -108,7 +112,6 @@ in your ``~/.pypirc`` file::
     [distutils]
     index-servers =
         pypi
-        warehouse
 
     [pypi]
     username:your_user_name
