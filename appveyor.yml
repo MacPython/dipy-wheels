@@ -1,0 +1,80 @@
+# vim ft=yaml
+# CI on Windows via appveyor
+
+environment:
+  global:
+    BUILD_COMMIT: master
+    REPO_DIR: dipy
+    PKG_NAME: dipy
+    NP_BUILD_DEP: "numpy==1.10.4"
+    NP_TEST_DEP: "numpy==1.10.4"
+    EXTRA_FLAGS: ""
+    WHEELHOUSE_UPLOADER_USERNAME: travis-worker
+    WHEELHOUSE_UPLOADER_SECRET:
+      secure: 9s0gdDGnNnTt7hvyNpn0/ZzOMGPdwPp2SewFTfGzYk7uI+rdAN9rFq2D1gAP4NQh
+
+  matrix:
+    - PYTHON: C:\Python27
+    - PYTHON: C:\Python27-x64
+    - PYTHON: C:\Python34
+    - PYTHON: C:\Python34-x64
+    - PYTHON: C:\Python35
+    - PYTHON: C:\Python35-x64
+    - PYTHON: C:\Python36
+      NP_BUILD_DEP: "numpy==1.12"
+      NP_TEST_DEP: "numpy==1.12"
+    - PYTHON: C:\Python36-x64
+      NP_BUILD_DEP: "numpy==1.12"
+      NP_TEST_DEP: "numpy==1.12"
+
+install:
+  # Prepend newly installed Python to the PATH of this build (this cannot be
+  # done from inside the powershell script as it would require to restart
+  # the parent CMD process).
+  - SET PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+  - python -m pip install -U pip
+
+  # Fix MSVC builds for 64-bit Python. See:
+  # http://stackoverflow.com/questions/32091593/cannot-install-windows-sdk-7-1-on-windows-10
+  - echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
+
+  # Install the dependencies of the project.
+  - pip install %NP_BUILD_DEP% Cython nose nibabel scipy
+  # Pin wheel to 0.26 to avoid Windows ABI tag for built wheel
+  - pip install wheel==0.26
+  # Build wheel
+  - cd %REPO_DIR%
+  - git submodule update --init
+  - git checkout %BUILD_COMMIT%
+  - python setup.py bdist_wheel
+  - cd ..
+
+build: false  # Not a C# project, build stuff at the test step instead.
+
+test_script:
+  - pip install %NP_TEST_DEP%
+  - pip install --pre --no-index --find-links .\%REPO_DIR%\dist %PKG_NAME%
+  # Change into an innocuous directory and find tests from installation
+  - mkdir for_testing
+  - cd for_testing
+  - python --version
+  - python ..\dipy\tools\dipnost dipy
+  - cd ..
+
+artifacts:
+  # Archive the generated wheel package in the ci.appveyor.com build report.
+  - path: %REPO_DIR%\dist\*
+
+on_success:
+  # Upload the generated wheel package to Rackspace
+  # On Windows, Apache Libcloud cannot find a standard CA cert bundle so we
+  # disable the ssl checks.
+  - pip install wheelhouse-uploader
+  - python -m wheelhouse_uploader upload --no-update-index --no-ssl-check --local-folder=%REPO_DIR%\dist wheels
+
+cache:
+  # Use the appveyor cache to avoid re-downloading large archives such
+  # the MKL numpy and scipy wheels mirrored on a rackspace cloud
+  # container, speed up the appveyor jobs and reduce bandwidth
+  # usage on our rackspace account.
+  - '%APPDATA%\pip\Cache'
