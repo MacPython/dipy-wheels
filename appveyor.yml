@@ -25,9 +25,9 @@ environment:
       # Need 1.13 for h5py (h5py linked against 1.13)
       NP_BUILD_DEP: "numpy==1.13"
       NP_TEST_DEP: "numpy==1.13"
-    - PYTHON: C:\Python36-x64
-      NP_BUILD_DEP: "numpy==1.13"
-      NP_TEST_DEP: "numpy==1.13"
+  # - PYTHON: C:\Python36-x64
+  #   NP_BUILD_DEP: "numpy==1.13"
+  #   NP_TEST_DEP: "numpy==1.13"
 
 install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
@@ -62,7 +62,7 @@ test_script:
   - cd for_testing
   - python --version
   - 'echo backend : agg > matplotlibrc'
-  - nosetests --with-doctest --verbose dipy
+  # nosetests --with-doctest --verbose dipy
   - cd ..
 
 artifacts:
