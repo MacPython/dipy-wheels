@@ -9,6 +9,7 @@ environment:
     NP_BUILD_DEP: "numpy==1.10.4"
     NP_TEST_DEP: "numpy==1.10.4"
     EXTRA_FLAGS: ""
+    CYTHON_DEP: "Cython==0.27.3"
     WHEELHOUSE_UPLOADER_USERNAME: travis-worker
     WHEELHOUSE_UPLOADER_SECRET:
       secure: 9s0gdDGnNnTt7hvyNpn0/ZzOMGPdwPp2SewFTfGzYk7uI+rdAN9rFq2D1gAP4NQh
@@ -39,7 +40,7 @@ install:
   - echo "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 > "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64/vcvars64.bat"
 
   # Install the build dependencies of the project.
-  - pip install %NP_BUILD_DEP% Cython nibabel scipy
+  - pip install %NP_BUILD_DEP% %CYTHON_DEP% nibabel scipy
   # Pin wheel to 0.26 to avoid Windows ABI tag for built wheel
   - pip install wheel==0.26
   # Build wheel
