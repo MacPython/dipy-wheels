@@ -15,18 +15,19 @@ environment:
       secure: 9s0gdDGnNnTt7hvyNpn0/ZzOMGPdwPp2SewFTfGzYk7uI+rdAN9rFq2D1gAP4NQh
 
   matrix:
-    - PYTHON: C:\Python27
-    - PYTHON: C:\Python27-x64
-    - PYTHON: C:\Python34
-    - PYTHON: C:\Python34-x64
-    - PYTHON: C:\Python35
-    - PYTHON: C:\Python35-x64
+  # - PYTHON: C:\Python27
+  # - PYTHON: C:\Python27-x64
+  # - PYTHON: C:\Python34
+  # - PYTHON: C:\Python34-x64
+  # - PYTHON: C:\Python35
+  # - PYTHON: C:\Python35-x64
     - PYTHON: C:\Python36
-      NP_BUILD_DEP: "numpy==1.12"
-      NP_TEST_DEP: "numpy==1.12"
+      # Need 1.13 for h5py (h5py linked against 1.13)
+      NP_BUILD_DEP: "numpy==1.13"
+      NP_TEST_DEP: "numpy==1.13"
     - PYTHON: C:\Python36-x64
-      NP_BUILD_DEP: "numpy==1.12"
-      NP_TEST_DEP: "numpy==1.12"
+      NP_BUILD_DEP: "numpy==1.13"
+      NP_TEST_DEP: "numpy==1.13"
 
 install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
