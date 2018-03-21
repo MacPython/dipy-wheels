@@ -10,5 +10,6 @@ function pre_build {
 function run_tests {
     # Runs tests on installed distribution from an empty directory
     python --version
-    python ../dipy/tools/dipnost dipy
+    echo "backend : agg" > matplotlibrc
+    nosetests --with-doctest --verbose dipy
 }

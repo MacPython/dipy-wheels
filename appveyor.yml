@@ -60,7 +60,8 @@ test_script:
   - mkdir for_testing
   - cd for_testing
   - python --version
-  - python ..\dipy\tools\dipnost dipy
+  - 'echo backend : agg > matplotlibrc'
+  - nosetests --with-doctest --verbose dipy
   - cd ..
 
 artifacts:
