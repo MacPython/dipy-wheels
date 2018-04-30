@@ -6,7 +6,7 @@ We automate wheel building using this custom github repository that builds on
 the travis-ci OSX machines, travis-ci Linux machines, and the Appveyor VMs.
 
 The travis-ci interface for the builds is
-https://travis-ci.org/MacPython/cython-wheels
+https://travis-ci.org/MacPython/dipy-wheels
 
 Appveyor interface at
 https://ci.appveyor.com/project/matthew-brett/dipy-wheels
