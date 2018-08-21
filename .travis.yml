@@ -75,6 +75,19 @@ matrix:
         - NP_BUILD_DEP=numpy==1.11.3
         - NP_TEST_DEP=numpy==1.11.3
         - SCIPY_DEP=scipy
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.7
+        - NP_BUILD_DEP=numpy==1.14.5
+        - NP_TEST_DEP=numpy==1.14.5
+        - SCIPY_DEP=scipy
+    - os: linux
+      env:
+        - MB_PYTHON_VERSION=3.7
+        - PLAT=i686
+        - NP_BUILD_DEP=numpy==1.14.5
+        - NP_TEST_DEP=numpy==1.14.5
+        - SCIPY_DEP=scipy
     - os: osx
       language: generic
       env: MB_PYTHON_VERSION=2.7
@@ -95,6 +108,13 @@ matrix:
         - MB_PYTHON_VERSION=3.6
         - NP_BUILD_DEP=numpy==1.11.3
         - NP_TEST_DEP=numpy==1.11.3
+        - SCIPY_DEP=scipy
+    - os: osx
+      language: generic
+      env:
+        - MB_PYTHON_VERSION=3.7
+        - NP_BUILD_DEP=numpy==1.14.5
+        - NP_TEST_DEP=numpy==1.14.5
         - SCIPY_DEP=scipy
 
 before_install:
