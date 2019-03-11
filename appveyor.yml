@@ -62,14 +62,14 @@ build: false  # Not a C# project, build stuff at the test step instead.
 
 test_script:
   # Install the test dependencies
-  - pip install %NP_TEST_DEP% nose h5py
+  - pip install %NP_TEST_DEP% nose pytest h5py
   - pip install --pre --no-index --find-links .\%REPO_DIR%\dist %PKG_NAME%
   # Change into an innocuous directory and find tests from installation
   - mkdir for_testing
   - cd for_testing
   - python --version
   - 'echo backend : agg > matplotlibrc'
-  - nosetests --with-doctest --verbose dipy
+  - pytest -s --doctest-modules --verbose --pyargs dipy
   - cd ..
 
 artifacts:

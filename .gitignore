@@ -2,3 +2,6 @@
 tmp_for_test/
 working/
 build/
+.idea/
+.vscode/
+wheel-uploader.py

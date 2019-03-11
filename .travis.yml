@@ -119,7 +119,7 @@ matrix:
 
 before_install:
     - BUILD_DEPENDS="$NP_BUILD_DEP Cython nibabel"
-    - TEST_DEPENDS="$NP_TEST_DEP nose nibabel $SCIPY_DEP"
+    - TEST_DEPENDS="$NP_TEST_DEP nose pytest nibabel $SCIPY_DEP"
     - source multibuild/common_utils.sh
     - source multibuild/travis_steps.sh
     - before_install

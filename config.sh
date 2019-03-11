@@ -11,5 +11,5 @@ function run_tests {
     # Runs tests on installed distribution from an empty directory
     python --version
     echo "backend : agg" > matplotlibrc
-    nosetests --with-doctest --verbose dipy
+    pytest -s --doctest-modules --verbose --pyargs dipy
 }
