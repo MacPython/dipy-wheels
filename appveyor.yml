@@ -3,22 +3,18 @@
 
 environment:
   global:
-    BUILD_COMMIT: 0.16.0
+    BUILD_COMMIT: a5d66dd
     REPO_DIR: dipy
     PKG_NAME: dipy
     NP_BUILD_DEP: "numpy==1.10.4"
     NP_TEST_DEP: "numpy==1.10.4"
     EXTRA_FLAGS: ""
-    CYTHON_DEP: "Cython==0.27.3"
+    CYTHON_DEP: "Cython==0.29"
     WHEELHOUSE_UPLOADER_USERNAME: travis-worker
     WHEELHOUSE_UPLOADER_SECRET:
       secure: 9s0gdDGnNnTt7hvyNpn0/ZzOMGPdwPp2SewFTfGzYk7uI+rdAN9rFq2D1gAP4NQh
 
   matrix:
-    - PYTHON: C:\Python27
-    - PYTHON: C:\Python27-x64
-    - PYTHON: C:\Python34
-    - PYTHON: C:\Python34-x64
     - PYTHON: C:\Python35
     - PYTHON: C:\Python35-x64
     - PYTHON: C:\Python36
