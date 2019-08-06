@@ -6,8 +6,8 @@ environment:
     BUILD_COMMIT: 1.0.0
     REPO_DIR: dipy
     PKG_NAME: dipy
-    NP_BUILD_DEP: "numpy==1.10.4"
-    NP_TEST_DEP: "numpy==1.10.4"
+    NP_BUILD_DEP: "numpy==1.13.3"
+    NP_TEST_DEP: "numpy==1.13.3"
     EXTRA_FLAGS: ""
     CYTHON_DEP: "Cython==0.29"
     WHEELHOUSE_UPLOADER_USERNAME: travis-worker
@@ -19,11 +19,11 @@ environment:
     - PYTHON: C:\Python35-x64
     - PYTHON: C:\Python36
       # Need 1.13 for h5py (h5py linked against 1.13)
-      NP_BUILD_DEP: "numpy==1.13"
-      NP_TEST_DEP: "numpy==1.13"
+      NP_BUILD_DEP: "numpy==1.13.3"
+      NP_TEST_DEP: "numpy==1.13.3"
     - PYTHON: C:\Python36-x64
-      NP_BUILD_DEP: "numpy==1.13"
-      NP_TEST_DEP: "numpy==1.13"
+      NP_BUILD_DEP: "numpy==1.13.3"
+      NP_TEST_DEP: "numpy==1.13.3"
     - PYTHON: C:\Python37
       # Need 1.13 for h5py (h5py linked against 1.13)
       NP_BUILD_DEP: "numpy==1.14.5"
