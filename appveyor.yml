@@ -3,7 +3,7 @@
 
 environment:
   global:
-    BUILD_COMMIT: a5d66dd
+    BUILD_COMMIT: 1.0.0
     REPO_DIR: dipy
     PKG_NAME: dipy
     NP_BUILD_DEP: "numpy==1.10.4"
