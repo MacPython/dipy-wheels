@@ -4,4 +4,3 @@ working/
 build/
 .idea/
 .vscode/
-wheel-uploader.py
