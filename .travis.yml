@@ -1,13 +1,13 @@
 env:
   global:
       - REPO_DIR=dipy
-      - BUILD_COMMIT=0.16.0
+      - BUILD_COMMIT=a5d66dd
       - PLAT=x86_64
       - UNICODE_WIDTH=32
-      - NP_BUILD_DEP="numpy==1.7.1"
-      - NP_TEST_DEP="numpy==1.7.1"
+      - NP_BUILD_DEP="numpy==1.9"
+      - NP_TEST_DEP="numpy==1.9"
       # Pin scipy dependency for compatibility with older numpy.
-      - SCIPY_DEP="scipy==0.17.0"
+      - SCIPY_DEP="scipy==1.0"
       - WHEELHOUSE_UPLOADER_USERNAME=travis-worker
       # Following generated with
       # travis encrypt -r MacPython/dipy-wheels WHEELHOUSE_UPLOADER_SECRET=<the api key>
@@ -26,26 +26,6 @@ matrix:
       # Exclude the default Python 3.5 build
       - python: 3.5
   include:
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=2.7
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=2.7
-        - UNICODE_WIDTH=16
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=2.7
-        - PLAT=i686
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=2.7
-        - PLAT=i686
-        - UNICODE_WIDTH=16
-    - os: linux
-      env:
-        - MB_PYTHON_VERSION=3.4
-        - NP_TEST_DEP=numpy==1.8.1
     - os: linux
       env:
         - MB_PYTHON_VERSION=3.4
@@ -91,11 +71,6 @@ matrix:
     - os: osx
       language: generic
       env: MB_PYTHON_VERSION=2.7
-    - os: osx
-      language: generic
-      env:
-        - MB_PYTHON_VERSION=3.4
-        - NP_TEST_DEP=numpy==1.8.1
     - os: osx
       language: generic
       env:
