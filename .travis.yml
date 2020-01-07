@@ -1,7 +1,7 @@
 env:
   global:
       - REPO_DIR=dipy
-      - BUILD_COMMIT=2872a95
+      - BUILD_COMMIT=1.1.0
       - PLAT=x86_64
       - UNICODE_WIDTH=32
       - NP_BUILD_DEP="numpy==1.9"
