@@ -58,14 +58,14 @@ jobs:
         echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
         echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
         if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
-          echo ::set-env name=NP_BUILD_DEP::1.13.3
-          echo ::set-env name=NP_TEST_DEP::1.13.3
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
         elif [ "$MB_PYTHON_VERSION" == '3.7' ]; then
-          echo ::set-env name=NP_BUILD_DEP::1.14.5
-          echo ::set-env name=NP_TEST_DEP::1.13.3
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
         elif [ "$MB_PYTHON_VERSION" == '3.8' ]; then
-          echo ::set-env name=NP_BUILD_DEP::1.17.3
-          echo ::set-env name=NP_TEST_DEP::1.13.3
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.17.3)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.17.3)"
         else
           echo "None of the defined python version, use default"
         fi
