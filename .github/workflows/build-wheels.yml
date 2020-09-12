@@ -38,6 +38,7 @@ jobs:
       run:
         shell: bash
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8]
         os: [ubuntu-latest, macos-latest] #, windows-latest]
@@ -58,6 +59,8 @@ jobs:
         TRAVIS_OS_NAME: ${{ matrix.os }}
         SCIPY_DEP: scipy
       run: |
+        echo "::set-env name=PLAT::$(if [ "x32" == "${{ matrix.platform }}" ]; then echo "i686"; else echo "x86_64"; fi)"
+        echo "::set-env name=TRAVIS_OS_NAME::$(if [ "macos-latest" == "${{ matrix.os }}" ]; then echo "osx"; else echo "${{ matrix.os }}"; fi)"
         echo "::set-env name=TRAVIS_BRANCH::${TRAVIS_BRANCH:-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')}"
         echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
         if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
