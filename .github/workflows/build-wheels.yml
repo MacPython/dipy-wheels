@@ -11,25 +11,6 @@ on:
   schedule:
     - cron: '0 0 * * 0' # weekly
 
-env:
-  REPO_DIR: dipy
-  PKG_NAME: dipy
-  BUILD_COMMIT: 1.2.0
-  PLAT: x86_64
-  UNICODE_WIDTH: 32
-  NP_BUILD_DEP: "numpy==1.9"
-  NP_TEST_DEP: "numpy==1.9"
-  # Pin scipy dependency for compatibility with older numpy.
-  SCIPY_DEP: "scipy==1.0"
-  WHEELHOUSE_UPLOADER_USERNAME: travis-worker
-  # Following generated with
-  # travis encrypt -r MacPython/dipy-wheels WHEELHOUSE_UPLOADER_SECRET=<the api key>
-  WHEELHOUSE_UPLOADER_SECRET: "MSGVzUmPDQNUQCT8N/a07IPB0OzKc17lL615Z3srNRs37D1THRCSe5iaPj9PDkc8y2LGuY516bBFLU3xE2aqRP6NsXX9dQ9ynYaZxbGQnZijGR5mjj7SUEugW8Tyu0TXXr/0BYWq8QADgQAvPXfAIhK8FoE+w7UCi3zWU982IOk="
-  TRAVIS_REPO_SLUG: ${{ github.repository }}
-  TRAVIS_BRANCH: ${{ github.head_ref }}
-  TRAVIS_PULL_REQUEST: ${{ github.event.number }}
-  TRAVIS_BUILD_DIR: ${{ github.workspace }}
-
 jobs:
   build:
 
@@ -46,6 +27,24 @@ jobs:
         exclude:
           - os: macos-latest  # macos-10.15
             platform: x32
+    env:
+      REPO_DIR: dipy
+      PKG_NAME: dipy
+      BUILD_COMMIT: 1.2.0
+      UNICODE_WIDTH: 32
+      MB_PYTHON_VERSION: ${{ matrix.python-version }}
+      TRAVIS_PYTHON_VERSION: ${{ matrix.python-version }}
+      SCIPY_DEP: scipy
+      TRAVIS_REPO_SLUG: ${{ github.repository }}
+      TRAVIS_BRANCH: ${{ github.head_ref }}
+      TRAVIS_PULL_REQUEST: ${{ github.event.number }}
+      TRAVIS_BUILD_DIR: ${{ github.workspace }}
+      WHEELHOUSE_UPLOADER_USERNAME: travis-worker
+      # Following generated with
+      # travis encrypt -r MacPython/dipy-wheels WHEELHOUSE_UPLOADER_SECRET=<the api key>
+      WHEELHOUSE_UPLOADER_SECRET: "MSGVzUmPDQNUQCT8N/a07IPB0OzKc17lL615Z3srNRs37D1THRCSe5iaPj9PDkc8y2LGuY516bBFLU3xE2aqRP6NsXX9dQ9ynYaZxbGQnZijGR5mjj7SUEugW8Tyu0TXXr/0BYWq8QADgQAvPXfAIhK8FoE+w7UCi3zWU982IOk="
+
+
     steps:
     - uses: actions/checkout@v2
       with:
@@ -55,16 +54,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup Environment variable
-      env:
-        MB_PYTHON_VERSION: ${{ matrix.python-version }}
-        TRAVIS_PYTHON_VERSION: ${{ matrix.python-version }}
-        PLAT: ${{ matrix.platform }}
-        TRAVIS_OS_NAME: ${{ matrix.os }}
-        SCIPY_DEP: scipy
       run: |
         echo "::set-env name=PLAT::$(if [ "x32" == "${{ matrix.platform }}" ]; then echo "i686"; else echo "x86_64"; fi)"
         echo "::set-env name=TRAVIS_OS_NAME::$(if [ "macos-latest" == "${{ matrix.os }}" ]; then echo "osx"; else echo "${{ matrix.os }}"; fi)"
-        echo "::set-env name=TRAVIS_BRANCH::${TRAVIS_BRANCH:-$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')}"
         echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
         if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
           echo ::set-env name=NP_BUILD_DEP::1.13.3
@@ -78,14 +70,17 @@ jobs:
         else
           echo "None of the defined python version, use default"
         fi
-    # - name: Print some Environment variable
-    #   run: |
-    #     echo "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
-    #     echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
-    #     echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
-    #     echo "TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}"
-    #     echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
-    #     echo "NP_TEST_DEP: ${NP_TEST_DEP}"
+    - name: Print some Environment variable
+      run: |
+        echo "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
+        echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
+        echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
+        echo "TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}"
+        echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
+        echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
+        echo "NP_TEST_DEP: ${NP_TEST_DEP}"
+        echo "PLAT: ${PLAT}"
+
     - name: Install VirtualEnv
       run: |
         python -m pip install --upgrade pip
