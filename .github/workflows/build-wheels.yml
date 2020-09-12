@@ -35,6 +35,8 @@ jobs:
         platform: [x32, x64]
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -63,6 +65,8 @@ jobs:
         BUILD_DEPENDS: "$NP_BUILD_DEP Cython nibabel"
         TEST_DEPENDS: "$NP_TEST_DEP nose pytest nibabel $SCIPY_DEP"
       run: |
+        ls
+        pwd
         source multibuild/common_utils.sh
         source multibuild/travis_steps.sh
         before_install
