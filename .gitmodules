@@ -1,6 +1,6 @@
 [submodule "dipy"]
 	path = dipy
-	url = git://github.com/nipy/dipy.git
+	url = git://github.com/dipy/dipy.git
 [submodule "multibuild"]
 	path = multibuild
 	url = https://github.com/matthew-brett/multibuild.git
