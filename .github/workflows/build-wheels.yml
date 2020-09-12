@@ -43,6 +43,9 @@ jobs:
         python-version: [3.6, 3.7, 3.8]
         os: [ubuntu-latest, macos-latest] #, windows-latest]
         platform: [x32, x64]
+        exclude:
+          - os: macos-latest  # macos-10.15
+            platform: x32
     steps:
     - uses: actions/checkout@v2
       with:
@@ -95,9 +98,13 @@ jobs:
       run: |
         source multibuild/common_utils.sh
         source multibuild/travis_steps.sh
+        echo "------- BEFORE INSTALL --------"
         before_install
+        echo "------- CLEAN CODE --------"
         clean_code $REPO_DIR $BUILD_COMMIT
+        echo "------- BUILD WHEEL --------"
         build_wheel $REPO_DIR $PLAT
+        echo "------- INSTALL_RUN --------"
         install_run $PLAT
     # - name: Build Wheels
     #   run: |
