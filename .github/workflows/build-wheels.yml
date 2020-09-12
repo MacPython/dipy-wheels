@@ -60,6 +60,10 @@ jobs:
         else
           echo "None of the defined python version, use default"
         fi
+    - name: Install VirtualEnv
+      run: |
+        python -m pip install --upgrade pip
+        pip install virtualenv
     - name: Setup Multibuild
       env:
         BUILD_DEPENDS: "$NP_BUILD_DEP Cython nibabel"
