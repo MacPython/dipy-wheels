@@ -46,13 +46,13 @@ jobs:
         TRAVIS_OS_NAME: ${{ matrix.os }}
         SCIPY_DEP: scipy
       run: |
-        if [[ $MB_PYTHON_VERSION == '3.6' ]] then
+        if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
           run: echo ::set-env name=NP_BUILD_DEP::1.13.3
           run: echo ::set-env name=NP_TEST_DEP::1.13.3
-        elif [[ $MB_PYTHON_VERSION == '3.7' ]] then
+        elif [ "$MB_PYTHON_VERSION" == '3.7' ]; then
           run: echo ::set-env name=NP_BUILD_DEP::1.14.5
           run: echo ::set-env name=NP_TEST_DEP::1.13.3
-        elif [[ $MB_PYTHON_VERSION == '3.8' ]] then
+        elif [ "$MB_PYTHON_VERSION" == '3.8' ]; then
           run: echo ::set-env name=NP_BUILD_DEP::1.17.3
           run: echo ::set-env name=NP_TEST_DEP::1.13.3
         else
