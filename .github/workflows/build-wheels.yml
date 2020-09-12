@@ -70,6 +70,8 @@ jobs:
         else
           echo "None of the defined python version, use default"
         fi
+        echo "::set-env name=BUILD_DEPENDS::$(echo $NP_BUILD_DEP Cython nibabel)"
+        echo "::set-env name=TEST_DEPENDS::$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)"
     - name: Print some Environment variable
       run: |
         echo "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
@@ -80,6 +82,8 @@ jobs:
         echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
         echo "NP_TEST_DEP: ${NP_TEST_DEP}"
         echo "PLAT: ${PLAT}"
+        echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
+        echo "TEST_DEPENDS: ${TEST_DEPENDS}"
 
     - name: Install VirtualEnv
       run: |
@@ -87,9 +91,6 @@ jobs:
         pip install virtualenv
     # - name: Setup Multibuild
     - name: Build and Install Wheels
-      env:
-        BUILD_DEPENDS: "$NP_BUILD_DEP Cython nibabel"
-        TEST_DEPENDS: "$NP_TEST_DEP nose pytest nibabel $SCIPY_DEP"
       run: |
         source multibuild/common_utils.sh
         source multibuild/travis_steps.sh
