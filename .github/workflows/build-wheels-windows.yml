@@ -31,6 +31,7 @@ jobs:
       NP_TEST_DEP: "numpy==1.13.3"
       EXTRA_FLAGS: ""
       CYTHON_DEP: "Cython==0.29"
+      SCIPY_DEP: "scipy"
 
     steps:
     - uses: actions/checkout@v2
@@ -51,6 +52,7 @@ jobs:
         if [ "$PYTHON_VERSION" == '3.6' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
+          echo "::set-env name=SCIPY_DEP::$(echo scipy==1.0)"
         elif [ "$PYTHON_VERSION" == '3.7' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
@@ -77,7 +79,7 @@ jobs:
         python -m pip install --upgrade pip
         echo "------- Install Dependencies--------"
         pip install wheel==0.26
-        pip install ${NP_BUILD_DEP} ${CYTHON_DEP} nibabel scipy
+        pip install ${NP_BUILD_DEP} ${CYTHON_DEP} ${SCIPY_DEP} nibabel
         echo "------- Checkout BUILD_COMMIT --------"
         cd ${REPO_DIR}
         git submodule update --init
@@ -94,7 +96,7 @@ jobs:
     - name: Install Tests Dependencies
       run: |
         # Install the test dependencies
-        pip install ${NP_TEST_DEP} nose pytest h5py
+        pip install ${NP_TEST_DEP} ${SCIPY_DEP} ${CYTHON_DEP} nose pytest h5py
         pip install --pre --no-index --find-links ./${REPO_DIR}/dist ${PKG_NAME}
     - name: Run Tests
       env:
@@ -118,19 +120,17 @@ jobs:
         # per week)
         # SCIPY_WHEELS_NIGHTLY_ACCESS is a secret token
         # used in Travis CI config, originally
-        # generated at anaconda.org for scipy-wheels-nightly
-        if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
-              for f in wheelhouse/*.whl; do rename_wheel $f; done;
-              ANACONDA_ORG="scipy-wheels-nightly";
-              pip install git+https://github.com/Anaconda-Server/anaconda-client;
-              anaconda -t ${SCIPY_WHEELS_NIGHTLY_ACCESS} upload --force -u ${ANACONDA_ORG} ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl;
-        fi
+        #
         # for merges (push events) we use the staging area instead;
         # MULTIBUILD_WHEELS_STAGING_ACCESS is a secret token used in Travis
         # CI config, originally generated at anaconda.org for
         # multibuild-wheels-staging
-        if [ "$TRAVIS_EVENT_TYPE" == "push" ]; then
-              ANACONDA_ORG="multibuild-wheels-staging";
-              pip install git+https://github.com/Anaconda-Server/anaconda-client;
-              anaconda -t ${MULTIBUILD_WHEELS_STAGING_ACCESS} upload --force -u ${ANACONDA_ORG} ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl;
+        # generated at anaconda.org for scipy-wheels-nightly
+
+        echo "::set-env name=ANACONDA_ORG::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "scipy-wheels-nightly"; else echo "multibuild-wheels-staging"; fi)"
+        echo "::set-env name=TOKEN::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo $SCIPY_WHEELS_NIGHTLY_ACCESS; else echo $MULTIBUILD_WHEELS_STAGING_ACCESS; fi)"
+        if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "push" ]; then
+          pip install git+https://github.com/Anaconda-Server/anaconda-client;
+          ls ./${REPO_DIR}/dist/*.whl
+          anaconda -t ${TOKEN} upload --force -u ${ANACONDA_ORG} ./${REPO_DIR}/dist/*.whl;
         fi
