@@ -41,18 +41,20 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup Environment variable
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
         echo "::set-env name=PLAT::$(if [ "x32" == "${{ matrix.platform }}" ]; then echo "i686"; else echo "x86_64"; fi)"
         echo "::set-env name=TRAVIS_OS_NAME::$(if [ "macos-latest" == "${{ matrix.os }}" ]; then echo "osx"; else echo "${{ matrix.os }}"; fi)"
         echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
         echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
-        if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
+        if [ "$PYTHON_VERSION" == '3.6' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
-        elif [ "$MB_PYTHON_VERSION" == '3.7' ]; then
+        elif [ "$PYTHON_VERSION" == '3.7' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
-        elif [ "$MB_PYTHON_VERSION" == '3.8' ]; then
+        elif [ "$PYTHON_VERSION" == '3.8' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.17.3)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.17.3)"
         else
@@ -95,12 +97,13 @@ jobs:
         pip install ${NP_TEST_DEP} nose pytest h5py
         pip install --pre --no-index --find-links ./${REPO_DIR}/dist ${PKG_NAME}
     - name: Run Tests
+      env:
+        MPLBACKEND: Agg
       run: |
         # Change into an innocuous directory and find tests from installation
         mkdir for_testing
         cd for_testing
         python --version
-        'echo backend : agg > matplotlibrc'
         pytest -s --doctest-modules --verbose --pyargs ${PKG_NAME}
         cd ..
     - name: After success
