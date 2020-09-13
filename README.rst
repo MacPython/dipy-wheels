@@ -2,14 +2,11 @@
 Building and uploading dipy wheels
 ##################################
 
-We automate wheel building using this custom github repository that builds on
-the travis-ci OSX machines, travis-ci Linux machines, and the Appveyor VMs.
+We automate wheel building using this custom github repository that
+builds on Github Actions (they provide x86 and x64 machines for Windows, Linux and Mac).
 
-The travis-ci interface for the builds is
-https://travis-ci.org/MacPython/dipy-wheels
-
-Appveyor interface at
-https://ci.appveyor.com/project/matthew-brett/dipy-wheels
+The Github Actions interface for the builds is
+https://github.com/MacPython/dipy-wheels/actions
 
 The driving github repository is
 https://github.com/MacPython/dipy-wheels
@@ -25,24 +22,18 @@ The wheel-building repository:
   (Manylinux1_).  ``delocate`` and ``auditwheel`` copy the required dynamic
   libraries into the wheel and relinks the extension modules against the
   copied libraries;
-* uploads the built wheels to a Rackspace container - see "Using the
-  repository" above.  The containers were kindly donated by Rackspace to
-  scikit-learn).
+* uploads the built wheels to a container - The container is at the following link https://anaconda.org/scipy-wheels-nightly/ for weekly uploads
+and https://anaconda.org/multibuild-wheels-staging for staging wheels to PyPI.
 
 The resulting wheels are therefore self-contained and do not need any external
 dynamic libraries apart from those provided as standard by OSX / Linux as
 defined by the manylinux1 standard.
 
-The ``.travis.yml`` file in this repository has a line containing the API key
-for the Rackspace container encrypted with an RSA key that is unique to the
-repository - see http://docs.travis-ci.com/user/encryption-keys.  This
-encrypted key gives the travis build permission to upload to the Rackspace
-containers we use to house the uploads.
 
 Triggering a build
 ==================
 
-You will likely want to edit the ``.travis.yml`` and ``appveyor.yml`` files to
+You will likely want to edit the ``build-wheels.yml`` and ``build-wheels-windows.yml`` files to
 specify the ``BUILD_COMMIT`` before triggering a build - see below.
 
 You will need write permission to the github repository to trigger new builds
@@ -64,7 +55,7 @@ Which dipy commit does the repository build?
 ============================================
 
 The ``dipy-wheels`` repository will build the commit specified in the
-``BUILD_COMMIT`` at the top of the ``.travis.yml`` and ``appveyor.yml`` files.
+``BUILD_COMMIT`` at the top of the ``.build-wheels.yml`` and ``build-wheels-windows.yml`` files.
 This can be any naming of a commit, including branch name, tag name or commit
 hash.
 
@@ -72,7 +63,7 @@ Uploading the built wheels to PyPI
 ==================================
 
 * release container visible at
-  https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com
+  https://anaconda.org/multibuild-wheels-staging
 
 Be careful, this link points to a container on a distributed content delivery
 network.  It can take up to 15 minutes for the new wheel file to get updated
