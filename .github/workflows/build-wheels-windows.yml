@@ -41,12 +41,10 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Setup Environment variable
+    - name: Pin Numpy and Scipy version
       env:
         PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
-        echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
-        echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
         if [ "$PYTHON_VERSION" == '3.6' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
@@ -60,6 +58,10 @@ jobs:
         else
           echo "None of the defined python version, use default"
         fi
+    - name: Setup Environment variables
+      run: |
+        echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
+        echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
         echo "::set-env name=BUILD_DEPENDS::$(echo $NP_BUILD_DEP Cython nibabel)"
         echo "::set-env name=TEST_DEPENDS::$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)"
     - name: Print some Environment variable
