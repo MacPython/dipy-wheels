@@ -45,8 +45,6 @@ jobs:
       env:
         PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
-        echo "::set-env name=PLAT::$(if [ "x32" == "${{ matrix.platform }}" ]; then echo "i686"; else echo "x86_64"; fi)"
-        echo "::set-env name=TRAVIS_OS_NAME::$(if [ "macos-latest" == "${{ matrix.os }}" ]; then echo "osx"; else echo "${{ matrix.os }}"; fi)"
         echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
         echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
         if [ "$PYTHON_VERSION" == '3.6' ]; then
@@ -67,10 +65,9 @@ jobs:
     - name: Print some Environment variable
       run: |
         echo "TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}"
-        echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
+        echo "SCIPY_DEP: ${SCIPY_DEP}"
         echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
         echo "NP_TEST_DEP: ${NP_TEST_DEP}"
-        echo "PLAT: ${PLAT}"
         echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
         echo "TEST_DEPENDS: ${TEST_DEPENDS}"
     - name: Install Dependencies
