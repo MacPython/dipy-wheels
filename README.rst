@@ -70,49 +70,17 @@ network.  It can take up to 15 minutes for the new wheel file to get updated
 into the containers at the links above.
 
 When the wheels are updated, you can download them to your machine manually,
-and then upload them manually to PyPI, or by using twine_.  You can also use a
-script for doing this, housed at :
-https://github.com/MacPython/terryfy/blob/master/wheel-uploader
+and then upload them manually to PyPI, or by using twine_.
 
-For the ``wheel-uploader`` script, you'll need twine and `beautiful soup 4
-<bs4>`_.
+When the wheels are updated, you can download them manually or using the `download-wheels.py` script`,
+and then upload them manually or using twine. The download-wheels.py script is run as follows:
 
-You will typically have a directory on your machine where you store wheels,
-called a `wheelhouse`.   The typical call for `wheel-uploader` would then
-be something like::
+$ python3 download-wheels.py 1.2.0 -w <path_to_wheelhouse>
+$ twine upload <path_to_wheelhouse>/*.whl
 
-    VERSION=0.13.0
-    CDN_URL=https://3f23b170c54c2533c070-1c8a9b3114517dc5fe17b7c3f8c63a43.ssl.cf2.rackcdn.com
-    wheel-uploader -u $CDN_URL -s -v -w ~/wheelhouse -t all dipy $VERSION
+Where 1.2.0 is the release version, The wheelhouse argument is optional and defaults to ./release/installers.
 
-where:
-
-* ``-u`` gives the URL from which to fetch the wheels, here the https address,
-  for some extra security;
-* ``-s`` causes twine to sign the wheels with your GPG key;
-* ``-v`` means give verbose messages;
-* ``-w ~/wheelhouse`` means download the wheels from to the local directory
-  ``~/wheelhouse``.
-
-``dipy`` is the root name of the wheel(s) to download / upload, and ``0.13.0``
-is the version to download / upload.
-
-In order to upload the wheels, you will need something like this
-in your ``~/.pypirc`` file::
-
-    [distutils]
-    index-servers =
-        pypi
-
-    [pypi]
-    username:your_user_name
-    password:your_password
-
-So, in this case, `wheel-uploader` will download all wheels starting with
-`dipy-0.13.0-` from the URL in ``$CDN_URL`` above to ``~/wheelhouse``, then
-upload them to PyPI.
-
-Of course, you will need permissions to upload to PyPI, for this to work.
+You will need beautifulsoup4 and urllib3 installed in order to run download-wheels.py and permissions in order to upload to PyPI.
 
 .. _manylinux1: https://www.python.org/dev/peps/pep-0513
 .. _twine: https://pypi.python.org/pypi/twine

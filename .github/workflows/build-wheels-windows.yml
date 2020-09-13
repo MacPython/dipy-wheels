@@ -30,7 +30,7 @@ jobs:
       NP_BUILD_DEP: "numpy==1.13.3"
       NP_TEST_DEP: "numpy==1.13.3"
       EXTRA_FLAGS: ""
-      CYTHON_DEP: "Cython==0.29"
+      CYTHON_DEP: "Cython==0.29.14"
       SCIPY_DEP: "scipy"
 
     steps:
@@ -52,7 +52,7 @@ jobs:
         if [ "$PYTHON_VERSION" == '3.6' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
-          echo "::set-env name=SCIPY_DEP::$(echo scipy==1.0)"
+          echo "::set-env name=SCIPY_DEP::$(echo scipy==1.1.0)"
         elif [ "$PYTHON_VERSION" == '3.7' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
