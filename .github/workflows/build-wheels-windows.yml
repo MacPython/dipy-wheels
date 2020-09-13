@@ -109,7 +109,7 @@ jobs:
         pytest -s --doctest-modules --verbose --pyargs ${PKG_NAME}
         cd ..
     - name: After success
-      if: success()
+      if: always()
       env:
         SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
         MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
