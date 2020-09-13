@@ -77,10 +77,11 @@ jobs:
         pip install ${NP_BUILD_DEP} ${CYTHON_DEP} nibabel scipy
         pip install wheel==0.26
         echo "------- Checkout BUILD_COMMIT --------"
-        pwd
-        ls
         cd ${REPO_DIR}
         git submodule update --init
+        echo "--submodule ok"
+        git show-ref
+        git remote -vv
         git checkout ${BUILD_COMMIT}
         cd ..
     - name: Build Wheels
