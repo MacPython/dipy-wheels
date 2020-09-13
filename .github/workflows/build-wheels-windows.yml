@@ -79,7 +79,7 @@ jobs:
         echo "------- Checkout BUILD_COMMIT --------"
         cd ${REPO_DIR}
         git submodule update --init
-        git fetch
+        git fetch --tags
         git show-ref
         git remote -vv
         git checkout ${BUILD_COMMIT}
