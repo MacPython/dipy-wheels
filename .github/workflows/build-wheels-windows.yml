@@ -77,6 +77,8 @@ jobs:
         pip install ${NP_BUILD_DEP} ${CYTHON_DEP} nibabel scipy
         pip install wheel==0.26
         echo "------- Checkout BUILD_COMMIT --------"
+        pwd
+        ls
         cd ${REPO_DIR}
         git submodule update --init
         git checkout ${BUILD_COMMIT}
