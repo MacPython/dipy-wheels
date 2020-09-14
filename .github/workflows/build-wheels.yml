@@ -30,6 +30,21 @@ jobs:
           - os: ubuntu-latest
             platform: x32
             python-version: 3.8
+        include:
+          - os: ubuntu-latest
+            platform: x32
+            python-version: 3.8
+            env:
+              MB_ML_VER: "2010"
+              DOCKER_TEST_IMAGE: "multibuild/xenial_i686"
+          - os: ubuntu-latest
+            platform: x64
+            python-version: 3.8
+            env:
+              MB_ML_VER: "2010"
+              DOCKER_TEST_IMAGE: "multibuild/xenial_x86_64"
+
+
     env:
       REPO_DIR: dipy
       PKG_NAME: dipy
@@ -56,6 +71,7 @@ jobs:
         if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
+          echo "::set-env name=SCIPY_DEP::$(echo scipy==1.1.0)"
         elif [ "$MB_PYTHON_VERSION" == '3.7' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
           echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
