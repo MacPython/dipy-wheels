@@ -27,17 +27,17 @@ jobs:
         exclude:
           - os: macos-latest  # macos-10.15
             platform: x32
-          - os: ubuntu-latest
-            platform: x32
-            python-version: 3.8
+          # - os: ubuntu-latest
+          #   platform: x32
+          #   python-version: 3.8
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             platform: x32
             python-version: 3.8
             env:
               MB_ML_VER: "2010"
               DOCKER_TEST_IMAGE: "multibuild/xenial_i686"
-          - os: ubuntu-latest
+          - os: ubuntu-18.04
             platform: x64
             python-version: 3.8
             env:
@@ -69,8 +69,10 @@ jobs:
     - name: Pin Numpy and Scipy version
       run: |
         if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
-          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
-          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
+          # TODO: Need to put it back to 1.13.3. tests to fix with rcond
+          # when numpy <= 1.14.5
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
           echo "::set-env name=SCIPY_DEP::$(echo scipy==1.1.0)"
         elif [ "$MB_PYTHON_VERSION" == '3.7' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"

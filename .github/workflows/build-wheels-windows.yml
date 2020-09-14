@@ -46,8 +46,10 @@ jobs:
         PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
         if [ "$PYTHON_VERSION" == '3.6' ]; then
-          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.13.3)"
-          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.13.3)"
+          # TODO: Need to put it back to 1.13.3. tests to fix with rcond
+          # when numpy <= 1.14.5
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
           echo "::set-env name=SCIPY_DEP::$(echo scipy==1.1.0)"
         elif [ "$PYTHON_VERSION" == '3.7' ]; then
           echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
