@@ -32,6 +32,8 @@ jobs:
       EXTRA_FLAGS: ""
       CYTHON_DEP: "Cython==0.29.14"
       SCIPY_DEP: "scipy"
+      SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
+      MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
 
     steps:
     - uses: actions/checkout@v2
@@ -62,12 +64,15 @@ jobs:
         fi
     - name: Setup Environment variables
       run: |
+        echo "::set-env name=ANACONDA_ORG::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "scipy-wheels-nightly"; else echo "multibuild-wheels-staging"; fi)"
+        echo "::set-env name=TOKEN::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo $SCIPY_WHEELS_NIGHTLY_ACCESS; else echo $MULTIBUILD_WHEELS_STAGING_ACCESS; fi)"
         echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
         echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
         echo "::set-env name=BUILD_DEPENDS::$(echo $NP_BUILD_DEP Cython nibabel)"
         echo "::set-env name=TEST_DEPENDS::$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)"
     - name: Print some Environment variable
       run: |
+        echo "ANACONDA_ORG: ${ANACONDA_ORG}"
         echo "TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}"
         echo "SCIPY_DEP: ${SCIPY_DEP}"
         echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
@@ -111,9 +116,6 @@ jobs:
         cd ..
     - name: After success
       if: always()
-      env:
-        SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
-        MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
       run: |
         # trigger an upload to the shared ecosystem
         # infrastructure at: https://anaconda.org/scipy-wheels-nightly
@@ -128,8 +130,6 @@ jobs:
         # multibuild-wheels-staging
         # generated at anaconda.org for scipy-wheels-nightly
 
-        echo "::set-env name=ANACONDA_ORG::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "scipy-wheels-nightly"; else echo "multibuild-wheels-staging"; fi)"
-        echo "::set-env name=TOKEN::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo $SCIPY_WHEELS_NIGHTLY_ACCESS; else echo $MULTIBUILD_WHEELS_STAGING_ACCESS; fi)"
         if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "push" ]; then
           pip install git+https://github.com/Anaconda-Server/anaconda-client;
           ls ./${REPO_DIR}/dist/*.whl
