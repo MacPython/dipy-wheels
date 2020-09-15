@@ -1,0 +1,137 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Build wheels (Windows)
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    - cron: '0 0 * * 0' # weekly
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        platform: [x32, x64]
+    env:
+      BUILD_COMMIT: 1.2.0
+      REPO_DIR: dipy
+      PKG_NAME: dipy
+      NP_BUILD_DEP: "numpy==1.13.3"
+      NP_TEST_DEP: "numpy==1.13.3"
+      EXTRA_FLAGS: ""
+      CYTHON_DEP: "Cython==0.29.14"
+      SCIPY_DEP: "scipy"
+      SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
+      MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Pin Numpy and Scipy version
+      env:
+        PYTHON_VERSION: ${{ matrix.python-version }}
+      run: |
+        if [ "$PYTHON_VERSION" == '3.6' ]; then
+          # TODO: Need to put it back to 1.13.3. tests to fix with rcond
+          # when numpy <= 1.14.5
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
+          echo "::set-env name=SCIPY_DEP::$(echo scipy==1.1.0)"
+        elif [ "$PYTHON_VERSION" == '3.7' ]; then
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
+        elif [ "$PYTHON_VERSION" == '3.8' ]; then
+          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.17.3)"
+          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.17.3)"
+        else
+          echo "None of the defined python version, use default"
+        fi
+    - name: Setup Environment variables
+      run: |
+        echo "::set-env name=ANACONDA_ORG::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "scipy-wheels-nightly"; else echo "multibuild-wheels-staging"; fi)"
+        echo "::set-env name=TOKEN::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo $SCIPY_WHEELS_NIGHTLY_ACCESS; else echo $MULTIBUILD_WHEELS_STAGING_ACCESS; fi)"
+        echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
+        echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
+        echo "::set-env name=BUILD_DEPENDS::$(echo $NP_BUILD_DEP Cython nibabel)"
+        echo "::set-env name=TEST_DEPENDS::$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)"
+    - name: Print some Environment variable
+      run: |
+        echo "ANACONDA_ORG: ${ANACONDA_ORG}"
+        echo "TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}"
+        echo "SCIPY_DEP: ${SCIPY_DEP}"
+        echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
+        echo "NP_TEST_DEP: ${NP_TEST_DEP}"
+        echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
+        echo "TEST_DEPENDS: ${TEST_DEPENDS}"
+    - name: Install Dependencies
+      run: |
+        echo "------- Update PIP --------"
+        python -m pip install --upgrade pip
+        echo "------- Install Dependencies--------"
+        pip install wheel==0.26
+        pip install ${NP_BUILD_DEP} ${CYTHON_DEP} ${SCIPY_DEP} nibabel
+        echo "------- Checkout BUILD_COMMIT --------"
+        cd ${REPO_DIR}
+        git submodule update --init
+        git fetch --tags
+        git show-ref
+        git remote -vv
+        git checkout ${BUILD_COMMIT}
+        cd ..
+    - name: Build Wheels
+      run: |
+        cd ${REPO_DIR}
+        python setup.py bdist_wheel
+        cd ..
+    - name: Install Tests Dependencies
+      run: |
+        # Install the test dependencies
+        pip install ${NP_TEST_DEP} ${SCIPY_DEP} ${CYTHON_DEP} nose pytest h5py
+        pip install --pre --no-index --find-links ./${REPO_DIR}/dist ${PKG_NAME}
+    - name: Run Tests
+      env:
+        MPLBACKEND: Agg
+      run: |
+        # Change into an innocuous directory and find tests from installation
+        mkdir for_testing
+        cd for_testing
+        python --version
+        pytest -s --doctest-modules --verbose --pyargs ${PKG_NAME}
+        cd ..
+    - name: After success
+      if: always()
+      run: |
+        # trigger an upload to the shared ecosystem
+        # infrastructure at: https://anaconda.org/scipy-wheels-nightly
+        # for cron jobs only (restricted to master branch once
+        # per week)
+        # SCIPY_WHEELS_NIGHTLY_ACCESS is a secret token
+        # used in Travis CI config, originally
+        #
+        # for merges (push events) we use the staging area instead;
+        # MULTIBUILD_WHEELS_STAGING_ACCESS is a secret token used in Travis
+        # CI config, originally generated at anaconda.org for
+        # multibuild-wheels-staging
+        # generated at anaconda.org for scipy-wheels-nightly
+
+        if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "push" ]; then
+          pip install git+https://github.com/Anaconda-Server/anaconda-client;
+          ls ./${REPO_DIR}/dist/*.whl
+          anaconda -t ${TOKEN} upload --force -u ${ANACONDA_ORG} ./${REPO_DIR}/dist/*.whl;
+        fi
