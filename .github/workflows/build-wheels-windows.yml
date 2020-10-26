@@ -85,7 +85,7 @@ jobs:
         python -m pip install --upgrade pip
         echo "------- Install Dependencies--------"
         pip install wheel==0.26
-        pip install ${NP_BUILD_DEP} ${CYTHON_DEP} ${SCIPY_DEP} nibabel
+        pip install ${NP_BUILD_DEP} ${CYTHON_DEP} ${SCIPY_DEP} nibabel tqdm
         echo "------- Checkout BUILD_COMMIT --------"
         cd ${REPO_DIR}
         git submodule update --init
