@@ -120,8 +120,8 @@ jobs:
         build_wheel $REPO_DIR $PLAT
         echo "------- INSTALL_RUN --------"
         install_run $PLAT
-    - name: After success
-      if: success()
+    - name: Upload wheels
+      if: always()
       run: |
         # trigger an upload to the shared ecosystem
         # infrastructure at: https://anaconda.org/scipy-wheels-nightly
