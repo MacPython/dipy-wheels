@@ -50,26 +50,26 @@ jobs:
         if [ "$PYTHON_VERSION" == '3.6' ]; then
           # TODO: Need to put it back to 1.13.3. tests to fix with rcond
           # when numpy <= 1.14.5
-          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
-          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
-          echo "::set-env name=SCIPY_DEP::$(echo scipy==1.1.0)"
+          echo "NP_BUILD_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV
+          echo "NP_TEST_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV
+          echo "SCIPY_DEP=$(echo scipy==1.1.0)" >> $GITHUB_ENV
         elif [ "$PYTHON_VERSION" == '3.7' ]; then
-          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.14.5)"
-          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.14.5)"
+          echo "NP_BUILD_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV
+          echo "NP_TEST_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV
         elif [ "$PYTHON_VERSION" == '3.8' ]; then
-          echo "::set-env name=NP_BUILD_DEP::$(echo numpy==1.17.3)"
-          echo "::set-env name=NP_TEST_DEP::$(echo numpy==1.17.3)"
+          echo "NP_BUILD_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV
+          echo "NP_TEST_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV
         else
           echo "None of the defined python version, use default"
         fi
     - name: Setup Environment variables
       run: |
-        echo "::set-env name=ANACONDA_ORG::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "scipy-wheels-nightly"; else echo "multibuild-wheels-staging"; fi)"
-        echo "::set-env name=TOKEN::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo $SCIPY_WHEELS_NIGHTLY_ACCESS; else echo $MULTIBUILD_WHEELS_STAGING_ACCESS; fi)"
-        echo "::set-env name=TRAVIS_EVENT_TYPE::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "cron"; else echo "${{ github.event_name }}"; fi)"
-        echo "::set-env name=BUILD_COMMIT::$(if [ "schedule" == "${{ github.event_name }}" ]; then echo "master"; else echo $BUILD_COMMIT; fi)"
-        echo "::set-env name=BUILD_DEPENDS::$(echo $NP_BUILD_DEP Cython nibabel)"
-        echo "::set-env name=TEST_DEPENDS::$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)"
+        if [ "schedule" == "${{ github.event_name }}" ]; then echo "ANACONDA_ORG=scipy-wheels-nightly" >> $GITHUB_ENV; else echo "ANACONDA_ORG=multibuild-wheels-staging" >> $GITHUB_ENV; fi
+        if [ "schedule" == "${{ github.event_name }}" ]; then echo "TOKEN=$SCIPY_WHEELS_NIGHTLY_ACCESS" >> $GITHUB_ENV; else echo "$MULTIBUILD_WHEELS_STAGING_ACCESS" >> $GITHUB_ENV; fi
+        if [ "schedule" == "${{ github.event_name }}" ]; then echo "TRAVIS_EVENT_TYPE=cron" >> $GITHUB_ENV; else echo "TRAVIS_EVENT_TYPE=${{ github.event_name }}" >> $GITHUB_ENV; fi
+        if [ "schedule" == "${{ github.event_name }}" ]; then echo "BUILD_COMMIT=master" >> $GITHUB_ENV; else echo "BUILD_COMMIT=$BUILD_COMMIT" >> $GITHUB_ENV; fi
+        echo "BUILD_DEPENDS=$(echo $NP_BUILD_DEP Cython nibabel)" >> $GITHUB_ENV
+        echo "TEST_DEPENDS=$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)" >> $GITHUB_ENV
     - name: Print some Environment variable
       run: |
         echo "ANACONDA_ORG: ${ANACONDA_ORG}"
