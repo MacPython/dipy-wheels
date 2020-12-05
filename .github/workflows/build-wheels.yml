@@ -78,7 +78,7 @@ jobs:
     - name: Setup Environment variables
       run: |
         if [ "schedule" == "${{ github.event_name }}" ]; then echo "ANACONDA_ORG=scipy-wheels-nightly" >> $GITHUB_ENV; else echo "ANACONDA_ORG=multibuild-wheels-staging" >> $GITHUB_ENV; fi
-        if [ "schedule" == "${{ github.event_name }}" ]; then echo "TOKEN=$SCIPY_WHEELS_NIGHTLY_ACCESS" >> $GITHUB_ENV; else echo "$MULTIBUILD_WHEELS_STAGING_ACCESS" >> $GITHUB_ENV; fi
+        if [ "schedule" == "${{ github.event_name }}" ]; then echo "TOKEN=$SCIPY_WHEELS_NIGHTLY_ACCESS" >> $GITHUB_ENV; else echo "TOKEN=$MULTIBUILD_WHEELS_STAGING_ACCESS" >> $GITHUB_ENV; fi
         if [ "x32" == "${{ matrix.platform }}" ]; then echo "PLAT=i686" >> $GITHUB_ENV; else echo "PLAT=x86_64" >> $GITHUB_ENV; fi
         if [ "macos-latest" == "${{ matrix.os }}" ]; then echo "TRAVIS_OS_NAME=osx" >> $GITHUB_ENV; else echo "TRAVIS_OS_NAME=${{ matrix.os }}" >> $GITHUB_ENV; fi
         if [ "schedule" == "${{ github.event_name }}" ]; then echo "TRAVIS_EVENT_TYPE=cron" >> $GITHUB_ENV; else echo "TRAVIS_EVENT_TYPE=${{ github.event_name }}" >> $GITHUB_ENV; fi
@@ -88,7 +88,7 @@ jobs:
     - name: Setup Special Environment variables for Linux
       if: startsWith(matrix.os,'ubuntu') && matrix.MB_ML_VER == 2010
       run: |
-        echo "::set-env name=DOCKER_TEST_IMAGE::$(echo multibuild/xenial_$PLAT)"
+        echo "DOCKER_TEST_IMAGE=$(echo multibuild/xenial_$PLAT)" >> $GITHUB_ENV
     - name: Print some Environment variable
       run: |
         echo "ANACONDA_ORG: ${ANACONDA_ORG}"
