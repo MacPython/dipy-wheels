@@ -24,7 +24,7 @@ jobs:
         python-version: [3.6, 3.7, 3.8]
         platform: [x64]  # Deactivate x32, until fix in dipy
     env:
-      BUILD_COMMIT: 1.4.0
+      BUILD_COMMIT: master  # 1.4.0
       REPO_DIR: dipy
       PKG_NAME: dipy
       NP_BUILD_DEP: "numpy==1.13.3"
