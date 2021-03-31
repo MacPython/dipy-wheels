@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         os: [ubuntu-latest, macos-latest]
         platform: [x64]  # Deactivate x32, until fix in dipy
         MB_ML_VER: [1, 2010]
@@ -34,7 +34,7 @@ jobs:
     env:
       REPO_DIR: dipy
       PKG_NAME: dipy
-      BUILD_COMMIT: master  # 1.4.0
+      BUILD_COMMIT: 1.4.0  # master
       UNICODE_WIDTH: 32
       MB_PYTHON_VERSION: ${{ matrix.python-version }}
       TRAVIS_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -72,6 +72,9 @@ jobs:
         elif [ "$MB_PYTHON_VERSION" == '3.8' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV;
           echo "NP_TEST_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV;
+        elif [ "$MB_PYTHON_VERSION" == '3.9' ]; then
+          echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
+          echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
         else
           echo "None of the defined python version, use default"
         fi

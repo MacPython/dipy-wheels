@@ -21,10 +21,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7, 3.8, 3.9]
         platform: [x64]  # Deactivate x32, until fix in dipy
     env:
-      BUILD_COMMIT: master  # 1.4.0
+      BUILD_COMMIT: 1.4.0  # master
       REPO_DIR: dipy
       PKG_NAME: dipy
       NP_BUILD_DEP: "numpy==1.13.3"
@@ -59,6 +59,9 @@ jobs:
         elif [ "$PYTHON_VERSION" == '3.8' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV
           echo "NP_TEST_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV
+        elif [ "$PYTHON_VERSION" == '3.9' ]; then
+          echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV
+          echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV
         else
           echo "None of the defined python version, use default"
         fi
