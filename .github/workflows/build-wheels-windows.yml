@@ -43,7 +43,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Pin Numpy and Scipy version
+    - name: Pin Numpy, Scipy and Cython version
       env:
         PYTHON_VERSION: ${{ matrix.python-version }}
       run: |
@@ -62,6 +62,7 @@ jobs:
         elif [ "$PYTHON_VERSION" == '3.9' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV
           echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV
+          echo "CYTHON_DEP=$(echo Cython==0.29.22)" >> $GITHUB_ENV
         else
           echo "None of the defined python version, use default"
         fi
@@ -80,6 +81,7 @@ jobs:
         echo "SCIPY_DEP: ${SCIPY_DEP}"
         echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
         echo "NP_TEST_DEP: ${NP_TEST_DEP}"
+        echo "CYTHON_DEP: ${CYTHON_DEP}"
         echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
         echo "TEST_DEPENDS: ${TEST_DEPENDS}"
     - name: Install Dependencies
