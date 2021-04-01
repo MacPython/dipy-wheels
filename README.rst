@@ -73,10 +73,10 @@ When the wheels are updated, you can download them to your machine manually,
 and then upload them manually to PyPI, or by using twine_.
 
 When the wheels are updated, you can download them manually or using the `download-wheels.py` script`,
-and then upload them manually or using twine. The download-wheels.py script is run as follows:
+and then upload them manually or using twine. The download-wheels.py script is run as follows::
 
-$ python3 download-wheels.py 1.2.0 -w <path_to_wheelhouse>
-$ twine upload <path_to_wheelhouse>/*.whl
+  $ python3 download-wheels.py 1.2.0 -w <path_to_wheelhouse>
+  $ twine upload <path_to_wheelhouse>/*.whl
 
 Where 1.2.0 is the release version, The wheelhouse argument is optional and defaults to ./release/installers.
 
