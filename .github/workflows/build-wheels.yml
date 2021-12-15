@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, 3.10]
         os: [ubuntu-latest, macos-latest]
         platform: [x64]  # Deactivate x32, until fix in dipy
         MB_ML_VER: [1, 2010]
@@ -60,19 +60,16 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Pin Numpy and Scipy version
       run: |
-        if [ "$MB_PYTHON_VERSION" == '3.6' ]; then
-          # TODO: Need to put it back to 1.13.3. tests to fix with rcond
-          # when numpy <= 1.14.5
-          echo "NP_BUILD_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV;
-          echo "NP_TEST_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV;
-          echo "SCIPY_DEP=$(echo scipy==1.1.0)" >> $GITHUB_ENV;
-        elif [ "$MB_PYTHON_VERSION" == '3.7' ]; then
+        if [ "$MB_PYTHON_VERSION" == '3.7' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV;
           echo "NP_TEST_DEP=$(echo numpy==1.14.5)" >> $GITHUB_ENV;
         elif [ "$MB_PYTHON_VERSION" == '3.8' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV;
           echo "NP_TEST_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV;
         elif [ "$MB_PYTHON_VERSION" == '3.9' ]; then
+          echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
+          echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
+        elif [ "$MB_PYTHON_VERSION" == '3.10' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
           echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
         else
