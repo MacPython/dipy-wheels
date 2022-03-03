@@ -60,7 +60,7 @@ jobs:
         elif [ "$PYTHON_VERSION" == '3.10' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.21.2)" >> $GITHUB_ENV
           echo "NP_TEST_DEP=$(echo numpy==1.21.2)" >> $GITHUB_ENV
-          echo "CYTHON_DEP=$(echo Cython==0.29.22)" >> $GITHUB_ENV
+          echo "CYTHON_DEP=$(echo Cython==0.29.24)" >> $GITHUB_ENV
         else
           echo "None of the defined python version, use default"
         fi
