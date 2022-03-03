@@ -24,7 +24,7 @@ jobs:
         python-version: [3.7, 3.8, 3.9, '3.10']
         platform: [x64]  # Deactivate x32, until fix in dipy
     env:
-      BUILD_COMMIT: 1.4.1  # master
+      BUILD_COMMIT: master # 1.4.1
       REPO_DIR: dipy
       PKG_NAME: dipy
       NP_BUILD_DEP: "numpy==1.13.3"
@@ -82,6 +82,7 @@ jobs:
         echo "CYTHON_DEP: ${CYTHON_DEP}"
         echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
         echo "TEST_DEPENDS: ${TEST_DEPENDS}"
+        echo "BUILD_COMMIT: ${BUILD_COMMIT}"
     - name: Install Dependencies
       run: |
         echo "------- Update PIP --------"

@@ -34,7 +34,7 @@ jobs:
     env:
       REPO_DIR: dipy
       PKG_NAME: dipy
-      BUILD_COMMIT: 1.4.1
+      BUILD_COMMIT: master  # 1.4.1
       UNICODE_WIDTH: 32
       MB_PYTHON_VERSION: ${{ matrix.python-version }}
       TRAVIS_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -103,6 +103,7 @@ jobs:
         echo "DOCKER_TEST_IMAGE: ${DOCKER_TEST_IMAGE}"
         echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
         echo "TEST_DEPENDS: ${TEST_DEPENDS}"
+        echo "BUILD_COMMIT: ${BUILD_COMMIT}"
 
     - name: Install VirtualEnv
       run: |
