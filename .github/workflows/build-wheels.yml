@@ -34,6 +34,7 @@ jobs:
         include:
           - python-version: '3.10'
             MB_ML_VER: 2014
+            os: [ubuntu-latest, macos-latest]
     env:
       REPO_DIR: dipy
       PKG_NAME: dipy
