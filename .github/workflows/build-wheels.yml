@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, '3.10']
+        python-version: [3.7, 3.8, 3.9]
         os: [ubuntu-latest, macos-latest]
         platform: [x64]  # Deactivate x32, until fix in dipy
         MB_ML_VER: [1, 2010]
@@ -31,6 +31,9 @@ jobs:
           - os: ubuntu-latest
             platform: x32
             python-version: 3.8
+        include:
+          - python-version: '3.10'
+            MB_ML_VER: 2014
     env:
       REPO_DIR: dipy
       PKG_NAME: dipy
