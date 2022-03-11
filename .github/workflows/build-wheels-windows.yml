@@ -30,7 +30,7 @@ jobs:
       NP_BUILD_DEP: "numpy==1.13.3"
       NP_TEST_DEP: "numpy==1.13.3"
       EXTRA_FLAGS: ""
-      CYTHON_DEP: "Cython==0.29.14"
+      CYTHON_DEP: "Cython==0.29.24"
       SCIPY_DEP: "scipy"
       SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
       MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
@@ -56,7 +56,7 @@ jobs:
         elif [ "$PYTHON_VERSION" == '3.9' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV
           echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV
-          echo "CYTHON_DEP=$(echo Cython==0.29.22)" >> $GITHUB_ENV
+          echo "CYTHON_DEP=$(echo Cython==0.29.24)" >> $GITHUB_ENV
         elif [ "$PYTHON_VERSION" == '3.10' ]; then
           echo "NP_BUILD_DEP=$(echo numpy==1.21.2)" >> $GITHUB_ENV
           echo "NP_TEST_DEP=$(echo numpy==1.21.2)" >> $GITHUB_ENV
