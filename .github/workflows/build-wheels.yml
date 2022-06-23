@@ -25,7 +25,8 @@ jobs:
         # os: [ubuntu-latest, macos-latest]
         os: [macos-latest]
         platform: [x64]  # Deactivate x32, until fix in dipy
-        MB_ML_VER: [1, 2010]
+        # MB_ML_VER: [1, 2010]
+        MB_ML_VER: [2010]
         exclude:
           - os: macos-latest  # macos-10.15
             platform: x32
