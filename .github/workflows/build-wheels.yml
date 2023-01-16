@@ -49,7 +49,7 @@ jobs:
     env:
       REPO_DIR: dipy
       PKG_NAME: dipy
-      BUILD_COMMIT: 1.5.0
+      BUILD_COMMIT: 1.6.0
       UNICODE_WIDTH: 32
       MB_PYTHON_VERSION: ${{ matrix.python-version }}
       TRAVIS_PYTHON_VERSION: ${{ matrix.python-version }}
