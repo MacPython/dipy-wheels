@@ -30,6 +30,9 @@ jobs:
           - python-version: '3.10'
             os: ubuntu-latest
             MB_ML_VER: 2014
+          - python-version: '3.11'
+            os: ubuntu-latest
+            MB_ML_VER: 2014
           - python-version: '3.10'
             os: macos-latest
             MB_ML_VER: 2014
@@ -42,6 +45,10 @@ jobs:
             MB_ML_VER: 2014
             PLAT: universal2
           - python-version: '3.10'
+            os: macos-latest
+            MB_ML_VER: 2014
+            PLAT: universal2
+          - python-version: '3.11'
             os: macos-latest
             MB_ML_VER: 2014
             PLAT: universal2
@@ -64,14 +71,14 @@ jobs:
       MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Install libhdf5
       if: startsWith(matrix.os,'ubuntu')
       run: sudo apt-get install pkg-config libhdf5-103 libhdf5-dev
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: Pin Numpy and Scipy version
