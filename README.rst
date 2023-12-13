@@ -2,8 +2,8 @@
 Building and uploading dipy wheels
 ##################################
 
-We automate wheel building using this custom github repository that
-builds on Github Actions (they provide x86 and x64 machines for Windows, Linux and Mac).
+We automate wheel building using this custom github repository that builds
+Linux, macOS and Windows wheels using GitHub actions.
 
 The Github Actions interface for the builds is
 https://github.com/MacPython/dipy-wheels/actions
@@ -32,6 +32,11 @@ defined by the manylinux1 standard.
 
 Triggering a build
 ==================
+
+First, we recommend to update the DIPY submodule to the latest commit.
+This can be done by running the following command::
+
+  $ git submodule update --remote
 
 You will likely want to edit the ``build-wheels.yml`` and ``build-wheels-windows.yml`` files to
 specify the ``BUILD_COMMIT`` before triggering a build - see below.
