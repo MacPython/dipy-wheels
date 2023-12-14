@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 __version__ = '0.1'
 
 # Edit these for other projects.
-STAGING_URL = 'https://anaconda.org/multibuild-wheels-staging/dipy'
+STAGING_URL = "https://anaconda.org/scipy-wheels-nightly/dipy"  #'https://anaconda.org/multibuild-wheels-staging/dipy'
 PREFIX = 'dipy'
 
 
