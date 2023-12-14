@@ -1,178 +1,198 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Build wheels
-
+name: Build and upload nightly wheels
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0,3' # 2/weekly
+    #        ┌───────────── minute (0 - 59)
+    #        │ ┌───────────── hour (0 - 23)
+    #        │ │ ┌───────────── day of the month (1 - 31)
+    #        │ │ │ ┌───────────── month (1 - 12 or JAN-DEC)
+    #        │ │ │ │ ┌───────────── day of the week (0 - 6 or SUN-SAT)
+    #        │ │ │ │ │
+    - cron: "0 0 * * 0,3"  # Every Sunday and Wednesday at midnight
+
+env:
+  BUILD_COMMIT: "master"  # or a specific version, e.g., 1.8.0
+  CIBW_BUILD_VERBOSITY: 2
+  CIBW_TEST_REQUIRES: "-r dipy/requirements/build.txt pytest"
+  CIBW_TEST_COMMAND: pytest --pyargs dipy
+  CIBW_CONFIG_SETTINGS: "compile-args=-v"
+  CIBW_TEST_SKIP: "*"  # skip tests for all wheels
+  MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
+  SCIENTIFIC_PYTHON_NIGHTLY_WHEELS: ${{ secrets.SCIENTIFIC_PYTHON_NIGHTLY_WHEELS }}
+  SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-
+  build_linux_wheels:
+    name: Build python ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.8, 3.9]
-        os: [ubuntu-latest, macos-latest]
-        platform: [x64]
-        MB_ML_VER: [1, 2010]
-        PLAT: [x86_64] # [i686, x86_64]
-        include:
-          - python-version: '3.10'
-            os: ubuntu-latest
-            MB_ML_VER: 2014
-          - python-version: '3.11'
-            os: ubuntu-latest
-            MB_ML_VER: 2014
-          - python-version: '3.12'
-            os: ubuntu-latest
-            MB_ML_VER: 2014
-          - python-version: '3.10'
-            os: macos-latest
-            MB_ML_VER: 2014
-          - python-version: '3.11'
-            os: macos-latest
-            MB_ML_VER: 2014
-          - python-version: '3.12'
-            os: macos-latest
-            MB_ML_VER: 2014
-          - python-version: '3.9'
-            os: macos-latest
-            MB_ML_VER: 2014
-            PLAT: universal2
-          - python-version: '3.10'
-            os: macos-latest
-            MB_ML_VER: 2014
-            PLAT: universal2
-          - python-version: '3.11'
-            os: macos-latest
-            MB_ML_VER: 2014
-            PLAT: universal2
-          - python-version: '3.12'
-            os: macos-latest
-            MB_ML_VER: 2014
-            PLAT: universal2
-
-    env:
-      REPO_DIR: dipy
-      PKG_NAME: dipy
-      BUILD_COMMIT: master   # 1.7.0
-      UNICODE_WIDTH: 32
-      MB_PYTHON_VERSION: ${{ matrix.python-version }}
-      TRAVIS_PYTHON_VERSION: ${{ matrix.python-version }}
-      MB_ML_VER: ${{ matrix.MB_ML_VER }}
-      PLAT: ${{ matrix.PLAT }}
-      SCIPY_DEP: scipy
-      TRAVIS_REPO_SLUG: ${{ github.repository }}
-      TRAVIS_BRANCH: ${{ github.head_ref }}
-      TRAVIS_PULL_REQUEST: ${{ github.event.number }}
-      TRAVIS_BUILD_DIR: ${{ github.workspace }}
-      SCIPY_WHEELS_NIGHTLY_ACCESS: ${{ secrets.SCIPY_WHEELS_NIGHTLY_ACCESS }}
-      MULTIBUILD_WHEELS_STAGING_ACCESS: ${{ secrets.MULTIBUILD_WHEELS_STAGING_ACCESS }}
-
+        os: [ubuntu-latest]
+        cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*", "cp312-*"]
+        cibw_manylinux: [manylinux2014]
+        cibw_arch: ["x86_64", "aarch64"]
     steps:
-    - uses: actions/checkout@v3
-      with:
-        submodules: recursive
-    - name: Install libhdf5
-      if: startsWith(matrix.os,'ubuntu')
-      run: sudo apt-get install pkg-config libhdf5-103 libhdf5-dev
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Pin Numpy and Scipy version
-      run: |
-        if [ "$MB_PYTHON_VERSION" == '3.8' ]; then
-          echo "NP_BUILD_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV;
-          echo "NP_TEST_DEP=$(echo numpy==1.17.3)" >> $GITHUB_ENV;
-        elif [ "$MB_PYTHON_VERSION" == '3.9' ]; then
-          echo "NP_BUILD_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
-          echo "NP_TEST_DEP=$(echo numpy==1.19.4)" >> $GITHUB_ENV;
-        elif [ "$MB_PYTHON_VERSION" == '3.10' ]; then
-          echo "NP_BUILD_DEP=$(echo numpy==1.21.3)" >> $GITHUB_ENV;
-          echo "NP_TEST_DEP=$(echo numpy==1.21.3)" >> $GITHUB_ENV;
-        elif [ "$PYTHON_VERSION" == '3.11' ]; then
-          echo "NP_BUILD_DEP=$(echo numpy==1.23.2)" >> $GITHUB_ENV
-          echo "NP_TEST_DEP=$(echo numpy==1.23.2)" >> $GITHUB_ENV
-        elif [ "$PYTHON_VERSION" == '3.12' ]; then
-          echo "NP_BUILD_DEP=$(echo numpy==1.26.0)" >> $GITHUB_ENV
-          echo "NP_TEST_DEP=$(echo numpy==1.26.0)" >> $GITHUB_ENV
-        else
-          echo "None of the defined python version, use default"
-        fi
-    - name: Setup Environment variables
-      run: |
-        if [ "schedule" == "${{ github.event_name }}" ] || [ "master" == "$BUILD_COMMIT" ]; then echo "ANACONDA_ORG=scipy-wheels-nightly" >> $GITHUB_ENV; else echo "ANACONDA_ORG=multibuild-wheels-staging" >> $GITHUB_ENV; fi
-        if [ "schedule" == "${{ github.event_name }}" ] || [ "master" == "$BUILD_COMMIT" ]; then echo "TOKEN=$SCIPY_WHEELS_NIGHTLY_ACCESS" >> $GITHUB_ENV; else echo "TOKEN=$MULTIBUILD_WHEELS_STAGING_ACCESS" >> $GITHUB_ENV; fi
-        if [ "macos-latest" == "${{ matrix.os }}" ]; then echo "TRAVIS_OS_NAME=osx" >> $GITHUB_ENV; else echo "TRAVIS_OS_NAME=${{ matrix.os }}" >> $GITHUB_ENV; fi
-        if [ "schedule" == "${{ github.event_name }}" ]; then echo "TRAVIS_EVENT_TYPE=cron" >> $GITHUB_ENV; else echo "TRAVIS_EVENT_TYPE=${{ github.event_name }}" >> $GITHUB_ENV; fi
-        if [ "schedule" == "${{ github.event_name }}" ]; then echo "BUILD_COMMIT=master" >> $GITHUB_ENV; else echo "BUILD_COMMIT=$BUILD_COMMIT" >> $GITHUB_ENV; fi
-        echo "BUILD_DEPENDS=$(echo $NP_BUILD_DEP Cython nibabel)" >> $GITHUB_ENV;
-        echo "TEST_DEPENDS=$(echo $NP_TEST_DEP nose pytest nibabel $SCIPY_DEP)" >> $GITHUB_ENV;
-    - name: Setup Special Environment variables for Linux
-      if: startsWith(matrix.os,'ubuntu') && matrix.MB_ML_VER == 2010
-      run: |
-        echo "DOCKER_TEST_IMAGE=$(echo multibuild/xenial_$PLAT)" >> $GITHUB_ENV
-    - name: Print some Environment variable
-      run: |
-        echo "ANACONDA_ORG: ${ANACONDA_ORG}"
-        echo "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
-        echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
-        echo "TRAVIS_REPO_SLUG: ${TRAVIS_REPO_SLUG}"
-        echo "TRAVIS_EVENT_TYPE: ${TRAVIS_EVENT_TYPE}"
-        echo "TRAVIS_OS_NAME: ${TRAVIS_OS_NAME}"
-        echo "NP_BUILD_DEP: ${NP_BUILD_DEP}"
-        echo "NP_TEST_DEP: ${NP_TEST_DEP}"
-        echo "PLAT: ${PLAT}"
-        echo "DOCKER_TEST_IMAGE: ${DOCKER_TEST_IMAGE}"
-        echo "BUILD_DEPENDS: ${BUILD_DEPENDS}"
-        echo "TEST_DEPENDS: ${TEST_DEPENDS}"
-        echo "BUILD_COMMIT: ${BUILD_COMMIT}"
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: "3.12"
+      - name: Setup Environment variables
+        shell: bash
+        run: |
+          if [ "schedule" == "${{ github.event_name }}" ]; then echo "BUILD_COMMIT=master" >> $GITHUB_ENV; else echo "BUILD_COMMIT=$BUILD_COMMIT" >> $GITHUB_ENV; fi
+      - name: Set up QEMU
+        if: ${{ matrix.cibw_arch == 'aarch64' }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel
+      - name: Build the wheel
+        run: python -m cibuildwheel --output-dir dist dipy
+        env:
+            CIBW_BUILD: ${{ matrix.cibw_python }}
+            CIBW_ARCHS_LINUX: ${{ matrix.cibw_arch }}
+            CIBW_SKIP: "*-musllinux_*"
+            # CIBW_TEST_SKIP: "*_aarch64"
+            CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.cibw_manylinux }}
+            CIBW_MANYLINUX_I686_IMAGE: ${{ matrix.cibw_manylinux }}
+            CIBW_BEFORE_BUILD: 'git submodule foreach git checkout  ${{ env.BUILD_COMMIT }}'
+      - uses: actions/upload-artifact@v3
+        with:
+            name: wheels
+            path: ./dist/*.whl
 
-    - name: Install VirtualEnv
-      run: |
-        python -m pip install --upgrade pip
-        pip install virtualenv
-    - name: Build and Install Wheels
-      run: |
-        source multibuild/common_utils.sh
-        source multibuild/travis_steps.sh
-        echo "------- BEFORE INSTALL --------"
-        before_install
-        echo "------- CLEAN CODE --------"
-        clean_code $REPO_DIR $BUILD_COMMIT
-        echo "------- BUILD WHEEL --------"
-        build_wheel $REPO_DIR $PLAT
-        echo "------- INSTALL_RUN --------"
-        install_run $PLAT
-    - name: Upload wheels
-      if: always()
-      run: |
-        # trigger an upload to the shared ecosystem
-        # infrastructure at: https://anaconda.org/scipy-wheels-nightly
-        # for cron jobs only (restricted to master branch once
-        # per week)
-        # SCIPY_WHEELS_NIGHTLY_ACCESS is a secret token
-        # used in Travis CI config, originally
-        #
-        # for merges (push events) we use the staging area instead;
-        # MULTIBUILD_WHEELS_STAGING_ACCESS is a secret token used in Travis
-        # CI config, originally generated at anaconda.org for
-        # multibuild-wheels-staging
-        # generated at anaconda.org for scipy-wheels-nightly
+  build_osx_wheels:
+    name: Build python ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+        cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*", "cp312-*"]
+        cibw_manylinux: [manylinux1]
+        cibw_arch: ["x86_64", "arm64"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: "3.12"
+      - name: Setup Environment variables
+        shell: bash
+        run: |
+          if [ "schedule" == "${{ github.event_name }}" ]; then echo "BUILD_COMMIT=master" >> $GITHUB_ENV; else echo "BUILD_COMMIT=$BUILD_COMMIT" >> $GITHUB_ENV; fi
+      - name: Set up QEMU
+        if: ${{ matrix.cibw_arch == 'aarch64' }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel
+      - name: Build the wheel
+        run: python -m cibuildwheel --output-dir dist dipy
+        env:
+            CIBW_BUILD: ${{ matrix.cibw_python }}
+            CIBW_ARCHS_MACOS: ${{ matrix.cibw_arch }}
+            # CIBW_TEST_SKIP: "*_aarch64 *-macosx_arm64"
+            CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.cibw_manylinux }}
+            CIBW_MANYLINUX_I686_IMAGE: ${{ matrix.cibw_manylinux }}
+            CIBW_BEFORE_BUILD: 'git submodule foreach git checkout  ${{ env.BUILD_COMMIT }}'
+      - uses: actions/upload-artifact@v3
+        with:
+            name: wheels
+            path: ./dist/*.whl
 
-        if [ "$TRAVIS_EVENT_TYPE" == "cron" ] || [ "$TRAVIS_EVENT_TYPE" == "push" ]; then
-          pip install git+https://github.com/Anaconda-Platform/anaconda-client.git@ce89e4351eef0f3d2840c713397e013231de25f8;
-          ls ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl
-          anaconda -t ${TOKEN} upload --force -u ${ANACONDA_ORG} ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl;
-        fi
+  build_windows_wheels:
+    name: Build python ${{ matrix.cibw_python }} ${{ matrix.cibw_arch }} wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest]
+        cibw_python: ["cp38-*", "cp39-*", "cp310-*", "cp311-*", "cp312-*"]
+        cibw_arch: ["AMD64"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        name: Install Python
+        with:
+          python-version: "3.12"
+      - name: Setup Environment variables
+        shell: bash
+        run: |
+          if [ "schedule" == "${{ github.event_name }}" ]; then echo "BUILD_COMMIT=master" >> $GITHUB_ENV; else echo "BUILD_COMMIT=$BUILD_COMMIT" >> $GITHUB_ENV; fi
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel
+      - name: Build the wheel
+        run: python -m cibuildwheel --output-dir dist dipy
+        env:
+            CIBW_BUILD: ${{ matrix.cibw_python }}
+            CIBW_ARCHS_WINDOWS: ${{ matrix.cibw_arch }}
+            CIBW_CONFIG_SETTINGS: "setup-args=--vsenv compile-args=-v"
+            CIBW_BEFORE_BUILD: 'git submodule foreach git checkout  ${{ env.BUILD_COMMIT }}'
+      - uses: actions/upload-artifact@v3
+        with:
+            name: wheels
+            path: ./dist/*.whl
+
+  upload_anaconda:
+      permissions:
+        contents: write # for softprops/action-gh-release to create GitHub release
+      name: Upload to Anaconda
+      needs: [build_linux_wheels, build_osx_wheels, build_windows_wheels]
+      if: ${{ always() }} && github.repository_owner == 'dipy' && github.ref == 'refs/heads/master'
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/download-artifact@v3
+        id: download
+        with:
+          name: wheels
+          path: ./dist
+      - name: Setup Upload Variables
+        shell: bash
+        run: |
+            if [ "schedule" == "${{ github.event_name }}" ] || [ "push" == "${{ github.event_name }}" ]; then
+              echo "ANACONDA_UPLOAD=true" >> $GITHUB_ENV
+            else
+              echo "ANACONDA_UPLOAD=false" >> $GITHUB_ENV
+            fi
+            if [ "schedule" == "${{ github.event_name }}" ] || [ "master" == "$BUILD_COMMIT" ]; then
+              echo "ANACONDA_ORG=scipy-wheels-nightly" >> $GITHUB_ENV
+              echo "TOKEN=$SCIPY_WHEELS_NIGHTLY_ACCESS" >> $GITHUB_ENV
+              echo "LABEL=dev" >> $GITHUB_ENV
+            else
+              echo "ANACONDA_ORG=multibuild-wheels-staging" >> $GITHUB_ENV
+              echo "TOKEN=$MULTIBUILD_WHEELS_STAGING_ACCESS" >> $GITHUB_ENV
+              echo "LABEL=main" >> $GITHUB_ENV
+            fi
+      - name: Upload wheel
+        if : ${{ env.ANACONDA_UPLOAD == 'true' }}
+        uses: skoudoro/upload-nightly-action@9b762da1a334889ef13c35cb8b0161c1e49f4749   # scientific-python/upload-nightly-action@main
+        with:
+          artifacts_path: dist
+          anaconda_nightly_upload_token: ${{env.TOKEN}}
+          anaconda_nightly_upload_organization: ${{env.ANACONDA_ORG}}
+          anaconda_nightly_upload_labels: ${{env.LABEL}}
