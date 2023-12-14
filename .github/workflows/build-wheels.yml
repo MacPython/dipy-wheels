@@ -15,7 +15,7 @@ on:
     - cron: "0 0 * * 0,3"  # Every Sunday and Wednesday at midnight
 
 env:
-  BUILD_COMMIT: "master"  # or a specific version, e.g., 1.8.0
+  BUILD_COMMIT: "1.8.0"  # or a specific version, e.g., 1.8.0
   CIBW_BUILD_VERBOSITY: 2
   CIBW_TEST_REQUIRES: "-r dipy/requirements/build.txt pytest"
   CIBW_TEST_COMMAND: pytest --pyargs dipy
